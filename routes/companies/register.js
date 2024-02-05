@@ -1,8 +1,8 @@
+/* eslint-disable new-cap */
 // requiring express
-const express =require('express');
-const otpGen=require('../../models/onetimepassword/phoneotp');
-
-
+const express = require('express');
+// eslint-disable-next-line max-len
+const {getOtp} = require('../../controllers/organisationController/registerControl');
 
 // using express router
 
@@ -10,20 +10,8 @@ const otpGen=require('../../models/onetimepassword/phoneotp');
 // register.js
 
 
-
 const router = express.Router();
 
-router.post('/get-otp', (req, res) => {
-    console.log('minnu');
-    console.log(req.body);
-    otpGen.otpGenerate('9747491562') // Use otpGenerate from the imported object
-        .then((result) => {
-            console.log(result + 'ashannaaaaaaaaaaaaaaaaaaaaaaaa');
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    res.json('radhamani appa');
-});
+router.post('/get-otp', getOtp);
 
 module.exports = router;

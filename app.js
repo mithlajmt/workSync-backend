@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const register = require('./routes/companies/register');
 
 dotenv.config(); // Invoke dotenv to load environment variables
 
@@ -25,13 +26,12 @@ db.once('open', () => {
   // Log a message once the connection is successfully established
 });
 
-const otpGenerate = require('./models/onetimepassword/phoneotp');
 
 // Use middleware to parse JSON in the request body
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
-app.use('/register', otpGenerate);
+app.use('/register', register);
 
 // Start the server and listen for incoming requests
 app.listen(port, () => {

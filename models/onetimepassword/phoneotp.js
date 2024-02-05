@@ -21,12 +21,15 @@ const client = twilio(accountSid, authId);
 // Define an asynchronous function to generate and send OTP
 const otpGenerate = async function(phone) {
   console.log('otp function invoked');
-  console.log(phone);
+  console.log('Country Code:', countryCode);
+  console.log('Phone:', phone);
 
   // Create a verification request using Twilio's Verify API
   verification = await client.verify.v2.services(`${serviceSid}`)
-      .verifications.create({to: `${countryCode}${phone} `, channel: 'sms'});
+      .verifications.create({to: `+91${phone}`, channel: 'sms' });
 };
 
 // Export the OTP generation function for external use
-module.exports = otpGenerate;
+module.exports = {
+  otpGenerate,
+};
