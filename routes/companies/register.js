@@ -1,9 +1,9 @@
+/* eslint-disable max-len */
 /* eslint-disable new-cap */
 // requiring express
 const express = require('express');
 // eslint-disable-next-line max-len
-const {getOtp} = require('../../controllers/organisationController/registerControl');
-
+const {getOtp, otpVerify} = require('../../controllers/organisationController/registerControl');
 // using express router
 
 // eslint-disable-next-line new-cap
@@ -13,5 +13,7 @@ const {getOtp} = require('../../controllers/organisationController/registerContr
 const router = express.Router();
 
 router.post('/get-otp', getOtp);
+router.post('/verify-otp', otpVerify)
+// router.post('/verify-otp')
 
 module.exports = router;

@@ -33,6 +33,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/register', register);
 
+
 // Start the server and listen for incoming requests
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
