@@ -54,30 +54,21 @@ const getOtp = (req, res) => {
 
 
 
+const otpVerify= async (req, res)=>{
+  try {
+    const {otp, username, email, password, phoneNumber, role}=req.body;
+    const phone=+phoneNumber;
 
-
-const otpVerification = async function(otp) {
-  console.log('OTP function invoked');
-    try {
-      const verification_check = await twilio.verify.v2
-        .services(serviceId)
-        .verificationChecks.create({ to: `+91${phone}`, code: otp });
-
-      console.log(verification_check.status);
-  } catch (err) {
-    console.error('Error generating OTP:', err.message);
-    throw err;
+    // verification check
+    const verificationCheck =await client.verify.v2.services(serviceSid)
+        .verificationChecks.create({to: '+918606893474', code: otp});
+        console.log(verificationCheck.status);
   }
-};
-
-const otpVerify = (req, response)=>{
-  console.log(req.body, 'minuthaj');
-  onetp = req.body
-  otpVerification(req.body)
-  .then((data)=>{
-    console.log(data);
-  })
-  response.status(200).json({ user: 'savedUser', success: true })}
+  catch(err){
+    console.log(err.message);
+    console.log('hmm verification work but failed');
+  }
+}
 // Export the functions for external use
 module.exports = {
   getOtp,
