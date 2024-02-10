@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 // const validator = require('validator');
-const validator = require('validator')
+const validator = require('validator');
 
 const companySchema = new mongoose.Schema({
   // Company Name
@@ -53,8 +53,12 @@ const companySchema = new mongoose.Schema({
     type: Boolean,
     required: [true, 'Authentication failed, please verify your account'],
   },
+  role: {
+    type: String,
+    enum: ['companyAdmin'],
+    default: 'companyAdmin', // Set 'admin' as the default role
+  },
 });
-
 const Company = mongoose.model('Companies', companySchema);
 
 module.exports = Company;
