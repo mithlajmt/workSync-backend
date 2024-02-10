@@ -1,19 +1,17 @@
-/* eslint-disable max-len */
-/* eslint-disable new-cap */
+
 // requiring express
 const express = require('express');
 // eslint-disable-next-line max-len
-const {getOtp, otpVerify} = require('../../controllers/organisationController/registerControl');
-// using express router
+const {getOtp, otpVerify,verifyRegistration,checkCompanyData,patternValidation,isEmailAndPhoneAlreadyUsed} = require('../../controllers/organisationController/registerControl');
+const bodyParser = require('body-parser');
+
 
 // eslint-disable-next-line new-cap
-// register.js
-
-
 const router = express.Router();
 
-router.post('/get-otp', getOtp);
-router.post('/verify-otp', otpVerify)
+router.post('/get-otp',
+checkCompanyData,patternValidation,isEmailAndPhoneAlreadyUsed,getOtp,);
+router.post('/verify-otp', otpVerify,verifyRegistration);
 // router.post('/verify-otp')
 
 module.exports = router;
