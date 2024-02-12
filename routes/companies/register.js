@@ -8,6 +8,8 @@ const {
   patternValidation,
   isEmailAndPhoneAlreadyUsed,
 } = require('../../controllers/organisationController/registerControl');
+
+const  checkData = require('../../controllers/commonController/loginControl');
 const bodyParser = require('body-parser');
 
 // Create an Express router
@@ -18,7 +20,7 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 // Define routes with middleware and comments
-router.post('/get-otp', [
+router.post('/signup', [
   // Validate company data whether all data is available
   checkCompanyData,
   // check whether it follows the pattern for pass and email
@@ -34,6 +36,12 @@ router.post('/verify-otp', [
   otpVerify,
   // Complete registration process adding user into collectionn
   verifyRegistration,
+]);
+
+
+router.post('/login', [
+  checkData,
+  
 ]);
 
 // Export the router for use in the main application

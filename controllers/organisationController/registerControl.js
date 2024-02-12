@@ -220,7 +220,7 @@ const generateCompanyID = async (companyName, contactNumber) => {
 
   // Combine the parts to create the company ID with "COM-" prefix
   const companyID = `COM-${firstThreeLetters}${lastThreeDigits}${randomString}`;
-
+  console.log(companyID);
   return companyID;
 };
 

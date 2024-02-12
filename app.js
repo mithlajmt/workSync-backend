@@ -31,7 +31,8 @@ db.once('open', () => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use('/register', register);
+
+app.use('/', register);
 
 
 // Start the server and listen for incoming requests

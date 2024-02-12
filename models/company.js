@@ -59,6 +59,6 @@ const companySchema = new mongoose.Schema({
     default: 'companyAdmin', // Set 'admin' as the default role
   },
 });
-const Company = mongoose.model('Companies', companySchema);
+const Company = mongoose.model('companies', companySchema);
 
 module.exports = Company;
