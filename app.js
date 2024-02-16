@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const register = require('./routes/companies/register');
+const employee = require('./routes/companies/empoyee');
 
 dotenv.config(); // Invoke dotenv to load environment variables
 
@@ -33,6 +34,8 @@ app.use(express.urlencoded({extended: true}));
 
 
 app.use('/', register);
+app.use('/', employee);
+
 
 
 // Start the server and listen for incoming requests
