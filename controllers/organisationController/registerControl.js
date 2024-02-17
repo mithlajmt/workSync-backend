@@ -292,6 +292,7 @@ const verifyRegistration = async (req, res) => {
   }
 };
 
+
 // Export the functions for external use
 module.exports = {
   getOtp,

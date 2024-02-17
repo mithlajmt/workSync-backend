@@ -2,7 +2,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {checkDuplicate} = require('../../controllers/employeeControl/addingControl');
+const {validateToken,
+    checkRole,
+    validateEmployeeFields,
+    checkExisting,
+    generateEmployeeID,
+    addEmployeeToDatabase,} = require('../../controllers/employeeControl/addingControl');
 
 
 // Create an Express router
@@ -13,6 +18,11 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 router.post('/employee',[
-    checkDuplicate
+    validateToken,
+    checkRole,
+    validateEmployeeFields,
+    checkExisting,
+    generateEmployeeID,
+    addEmployeeToDatabase,
 ])
 module.exports=router;
