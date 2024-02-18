@@ -5,6 +5,8 @@ const twilio = require('twilio');
 const bcrypt = require('bcrypt');
 const Company = require('../../models/company');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authId = process.env.TWILIO_AUTH_TOKEN;

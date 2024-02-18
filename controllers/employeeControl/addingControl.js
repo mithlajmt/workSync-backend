@@ -1,6 +1,9 @@
 const employee = require('../../models/employee');
 const jwt = require('jsonwebtoken');
 const Employees =require('../../models/employee')
+const {hashPassword,generatePassword} = require('../../utilities/password')
+const {sendWelcomeEmail} = require('../../utilities/nodemail');
+
 
 
 /* eslint-disable require-jsdoc */
@@ -165,14 +168,17 @@ const validateToken = async (req, res, next) => {
       identityproof,
       photo,
     } = req.body;
+
     
     
     const status=true;
     const employeeID = req.employeeID;
     const {companyID}=req.user;
-    
+
+    const password = generatePassword(employeeName,contactEmail);
     console.log(req.employeeID);
     console.log('dfghjkl',employeeID);
+    const securityPass = await hashPassword(password)
 
     const newEmployee = new Employees({
             // Personal Information
@@ -200,12 +206,13 @@ const validateToken = async (req, res, next) => {
             status,
             employeeID,
             companyID,
-            password: '123',
+            password: securityPass,
     })
 
     await newEmployee.save();
+    await sendWelcomeEmail(contactEmail,employeeID,password);
     res.status(200).json({
-      success:false,
+      success:true,
       message:'user added successfully'
     })
     
