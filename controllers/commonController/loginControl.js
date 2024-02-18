@@ -1,58 +1,103 @@
+/* eslint-disable max-len */
 const Company = require('../../models/company');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const Employee = require('../../models/employee');
+require('dotenv').config();
+
 
 const checkData = async (req, res) => {
-  const {userID} = req.body;
+  const {userID, password} = req.body;
   const userType = userID.substring(0, 3);
-  // const [first,second,third] = userID  //es6 destructing just for knowledge
 
-  if (userType == 'COM') {
+  if (userType === 'COM') {
     try {
       const user = await Company.findOne({companyID: userID});
 
       if (user) {
-        const {companyID, contactEmail, role, _id} = user;
-        console.log(user);
-        console.log(_id);
-        const secretKey = process.env.JWT_SECRET;
-        const payload = {
-          companyID,
-          contactEmail,
-          _id,
-          role,
-        };
-        const expirationTIme = parseInt(process.env.JWT_EXPIRE, 10);
+        const {companyID, contactEmail, role, _id, password: hashedPassword} = user;
 
-        const token = jwt.sign(payload, secretKey, {
-          expiresIn: expirationTIme,
-        });
-        // eslint-disable-next-line max-len
-        res.status(200)
-            .json({
-              success: true,
-              message: 'Login data received successfully',
-              token,
-            });
+        const authorised = await bcrypt.compare(password, hashedPassword);
+
+        if (authorised) {
+          const secretKey = process.env.JWT_SECRET;
+          const payload = {
+            companyID,
+            contactEmail,
+            _id,
+            role,
+          };
+
+          const token = jwt.sign(payload, secretKey, {
+            expiresIn: '1hr',
+          });
+          console.log(token);
+
+          return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            token,
+          });
+        } else {
+          // Password doesn't match
+          return res.status(401).json({
+            success: false,
+            message: 'Login failed. Password does not match',
+          });
+        }
       } else {
-        res.status(200).json({message: 'Login monu received successfully'});
+        // User not found
+        return res.status(404).json({success: false, message: 'Authorization failed. User not found'});
       }
     } catch (error) {
       console.error('Error finding user:', error);
-      res.status(500).json({message: 'Internal Server Error'});
+      return res.status(500).json({success: false, message: 'Internal Server Error'});
     }
-  } else if (userType == 'EMP') {
+  } else if (userType === 'EMP') {
     try {
-      const user = await Company.findOne({companyID: userID});
+      const user = await Employee.findOne({employeeID: userID});
 
       if (user) {
-        console.log(user);
+        const {companyID, contactEmail, role, password: hashedPassword, _id, employeeID} = user;
+
+        const authorised = await bcrypt.compare(password, hashedPassword);
+
+        if (authorised) {
+          const secretKey = process.env.JWT_SECRET;
+          const payload = {
+            companyID,
+            contactEmail,
+            employeeID,
+            _id,
+            role,
+          };
+
+          const token = jwt.sign(payload, secretKey, {
+            expiresIn: '1h',
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            token,
+          });
+        } else {
+          // Password doesn't match
+          return res.status(401).json({
+            success: false,
+            message: 'Login failed. Password does not match',
+          });
+        }
       } else {
-        res.status(200).json({message: 'received successfully'});
+        // User not found
+        return res.status(404).json({success: false, message: 'Authorization failed. User not found'});
       }
     } catch (error) {
       console.error('Error finding user:', error);
-      res.status(500).json({message: 'Internal Server Error'});
+      return res.status(500).json({success: false, message: 'Internal Server Error'});
     }
+  } else {
+    return res.status(400).json({success: false, message: 'Invalid userType'});
   }
 };
 

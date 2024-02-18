@@ -271,11 +271,10 @@ const verifyRegistration = async (req, res) => {
       contactEmail,
       role: 'companyAdmin',
     };
-    const expiresIn = 60 * 60;
 
 
     const token = jwt.sign(payload, secretKey, {
-       expiresIn, // Specify the expiration time in milliseconds
+      expiresIn: '1hr', // Specify the expiration time in milliseconds
     });
 
 
