@@ -1,8 +1,8 @@
 const employee = require('../../models/employee');
 const jwt = require('jsonwebtoken');
 const Employees = require('../../models/employee');
-const { hashPassword, generatePassword } = require('../../utilities/password');
-const { sendWelcomeEmail } = require('../../utilities/nodemail');
+const {hashPassword, generatePassword} = require('../../utilities/password');
+const {sendWelcomeEmail} = require('../../utilities/nodemail');
 
 const validateEmployeeFields = async (req, res, next) => {
   const requiredFields = [
@@ -30,6 +30,7 @@ const validateEmployeeFields = async (req, res, next) => {
 };
 
 const validateToken = async (req, res, next) => {
+  // eslint-disable-next-line max-len
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
   const secretKey = process.env.JWT_SECRET;
 
@@ -59,11 +60,10 @@ const validateToken = async (req, res, next) => {
       });
     }
   }
-  
 };
 
 const checkRole = async (req, res, next) => {
-  const { role } = req.user;
+  const {role} = req.user;
 
   if (role === 'companyAdmin') {
     next();
@@ -77,14 +77,14 @@ const checkRole = async (req, res, next) => {
 };
 
 const checkExisting = async (req, res, next) => {
-  const { companyID } = req.user;
-  const { contactEmail } = req.body;
+  const {companyID} = req.user;
+  const {contactEmail} = req.body;
 
   console.log(req.body);
   console.log(companyID, contactEmail);
 
   try {
-    const existingUser = await employee.findOne({ contactEmail, companyID });
+    const existingUser = await employee.findOne({contactEmail, companyID});
 
     if (existingUser) {
       console.log('existing user');
@@ -106,7 +106,7 @@ const checkExisting = async (req, res, next) => {
 
 const generateEmployeeID = async (req, res, next) => {
   try {
-    const { contactNumber, contactEmail, employeeName, hiringDate } = req.body;
+    const {contactNumber, contactEmail, employeeName, hiringDate} = req.body;
 
     // Extract first 3 letters from employeeName
     const employeeNameAbbreviation = employeeName.slice(0, 3).toUpperCase();
@@ -144,7 +144,8 @@ const generateEmployeeID = async (req, res, next) => {
   } catch (error) {
     // Handle any errors that might occur during the ID generation process
     console.error('Error generating employee ID:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error while generating employee ID' });
+    // eslint-disable-next-line max-len
+    res.status(500).json({success: false, message: 'Internal Server Error while generating employee ID'});
   }
 };
 
@@ -176,7 +177,7 @@ const addEmployeeToDatabase = async (req, res) => {
 
     const status = true;
     const employeeID = req.employeeID;
-    const { companyID } = req.user;
+    const {companyID} = req.user;
 
     const password = generatePassword(employeeName, contactEmail);
     console.log(req.employeeID);
@@ -220,7 +221,8 @@ const addEmployeeToDatabase = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding employee to database:', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error while adding employee to database' });
+    // eslint-disable-next-line max-len
+    res.status(500).json({success: false, message: 'Internal Server Error while adding employee to database'});
   }
 };
 

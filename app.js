@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const register = require('./routes/companies/register');
 const employee = require('./routes/companies/empoyee');
+const department = require('./routes/companies/department');
 
 dotenv.config(); // Invoke dotenv to load environment variables
 
@@ -35,6 +36,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/', register);
 app.use('/', employee);
+app.use('/', department);
 
 
 
