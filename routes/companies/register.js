@@ -9,7 +9,7 @@ const {
   isEmailAndPhoneAlreadyUsed,
 } = require('../../controllers/organisationController/registerControl');
 
-const  checkData = require('../../controllers/commonController/loginControl');
+const checkData = require('../../controllers/commonController/loginControl');
 const bodyParser = require('body-parser');
 
 // Create an Express router
@@ -41,7 +41,7 @@ router.post('/verify-otp', [
 
 router.post('/login', [
   checkData,
-  
+
 ]);
 
 // Export the router for use in the main application

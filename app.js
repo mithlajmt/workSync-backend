@@ -28,17 +28,13 @@ db.once('open', () => {
   // Log a message once the connection is successfully established
 });
 
-
 // Use middleware to parse JSON in the request body
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-
 app.use('/', register);
-app.use('/', employee);
-app.use('/', department);
-
-
+app.use('/company', employee);
+app.use('company', department);
 
 // Start the server and listen for incoming requests
 app.listen(port, () => {

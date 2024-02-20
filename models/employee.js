@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const employeeSchema = new mongoose.Schema({
   // Personal Information
-  employeeName: {type: String, required: true},
-  dateOfBirth: {type: String, required: true},
+  employeeName: {
+    type: String,
+    required: true,
+  },
+  dateOfBirth: {
+    type: String,
+    required: true,
+  },
   gender: {type: String, enum: ['male', 'female'], required: true},
 
   //
