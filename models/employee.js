@@ -31,7 +31,10 @@ const employeeSchema = new mongoose.Schema({
 
   adharID: {type: String},
   photo: {type: String},
-  isActive: {type: Boolean},
+  isActive: {type: Boolean,
+    required: true,
+    default: true,
+  },
 });
 
 // Compound index on email and CompanyID

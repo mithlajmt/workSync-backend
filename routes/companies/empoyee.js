@@ -13,7 +13,8 @@ const {
 // eslint-disable-next-line max-len
 const {checkToken, isAdmin}= require('../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
-const {getFullEmployeeList}=require('../../controllers/organisationController/getEmployees');
+const {getFullEmployeeList,terminateEmployee}=require('../../controllers/organisationController/employeesreq');
+const {employeeExist}=require('../../utilities/employeeUtils')
 
 
 // Create an Express router
@@ -35,6 +36,13 @@ router.get('/employee', [
   checkToken,
   isAdmin,
   getFullEmployeeList,
+]);
+
+router.delete('/employee', [
+  checkToken,
+  isAdmin,
+  employeeExist,
+  terminateEmployee,
 
 ]);
 module.exports=router;

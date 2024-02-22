@@ -1,5 +1,5 @@
 
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const checkToken = async function(req, res, next) {
   // eslint-disable-next-line max-len
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
@@ -46,6 +46,8 @@ const isAdmin = async (req, res, next) => {
     });
   }
 };
+
+
 module.exports = {
   checkToken,
   isAdmin,
