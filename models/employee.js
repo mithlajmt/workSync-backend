@@ -28,9 +28,11 @@ const employeeSchema = new mongoose.Schema({
   // Role/Position
   role: {type: String, enum: ['departmentHead', 'employee'], required: true},
   password: {type: String, required: true},
+  salary: {type: String},
 
   adharID: {type: String},
   photo: {type: String},
+
   isActive: {type: Boolean,
     required: true,
     default: true,
@@ -40,6 +42,6 @@ const employeeSchema = new mongoose.Schema({
 // Compound index on email and CompanyID
 // employeeSchema.index({email: 1, CompanyID: 1}, {unique: true});
 
-const Employee = mongoose.model('poni', employeeSchema);
+const Employee = mongoose.model('ponis', employeeSchema);
 
 module.exports = Employee;

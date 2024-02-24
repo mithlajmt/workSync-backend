@@ -2,8 +2,9 @@ const Employee = require('../models/employee');
 
 const employeeExist = async (req, res, next)=> {
   try {
-    const employeeID = req.query.selected;
+    const employeeID = req.params.employeeID;
     const {companyID}=req.user;
+
 
     const employee = await Employee.findOne({employeeID, companyID});
 

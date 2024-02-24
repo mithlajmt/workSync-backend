@@ -2,17 +2,17 @@
 const employees = require('../../models/employee');
 const getFullEmployeeList = async (req, res) => {
   try {
-    const { companyID } = req.user;
+    const {companyID} = req.user;
     console.log(companyID);
     const employeeList = await employees.aggregate([
       {
-        $match: { companyID: companyID, isActive: true }
+        $match: {companyID: companyID, isActive: true},
       },
     ]);
     res.json(employeeList);
   } catch (error) {
     console.error('Error fetching employees:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({error: 'Internal Server Error'});
   }
 };
 
@@ -35,10 +35,6 @@ const terminateEmployee = async (req, res) => {
     );
 
     if (result) {
-      // The result.nModified is a property provided by MongoDB's updateOne operation.
-      // It represents the number of documents that were actually modified during the update.
-      //  If nModified is greater than 0, it means that at least one document was found and successfully updated.
-
       console.log('Employee terminated successfully.');
       // eslint-disable-next-line max-len
       res.status(200).json({success: true, message: 'Employee terminated successfully.'});
@@ -52,7 +48,62 @@ const terminateEmployee = async (req, res) => {
   }
 };
 
+
+const employeeData = async (req, res, next) => {
+  try {
+    const {companyID} = req.user;
+    const employeeID = req.params.employeeID;
+    console.log('hi', employeeID);
+
+    // Assuming `employees` is a model or database collection
+    // and you're using async/await for database operations
+    const employee = await employees.findOne({
+      companyID,
+      employeeID,
+    });
+
+    // Check if employee is found
+    if (employee) {
+      res.json({
+        success: true,
+        data: employee,
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Employee not found',
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching employee data:', error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
+const editEmployeedata = async (req, res) => {
+  const {companyID} = req.user;
+  const employeeID = req.params.employeeID;
+  const filter = {companyID, employeeID};
+  const update = req.body;
+
+  try {
+    const updatedEmployee = await employees.findOneAndUpdate(filter, update, {new: true});
+    console.log('Document updated successfully:', updatedEmployee);
+    res.status(200).json({success: true, message: 'Employee updated successfully.'});
+  } catch (error) {
+    console.error('Error updating document:', error);
+    res.status(500).json({success: false, message: 'Internal server error.'});
+  }
+};
+
+
 module.exports={
   getFullEmployeeList,
   terminateEmployee,
+  employeeData,
+  editEmployeedata,
 };
