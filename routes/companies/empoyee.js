@@ -1,5 +1,6 @@
 // Require necessary modules
 const express = require('express');
+const upload = require('../../utilities/multer')
 
 const {
   validateToken,
@@ -26,6 +27,7 @@ const router = express.Router();
 router.post('/employee', [
   validateToken,
   checkRole,
+  upload.single('identityProof'),
   validateEmployeeFields,
   checkExisting,
   generateEmployeeID,
