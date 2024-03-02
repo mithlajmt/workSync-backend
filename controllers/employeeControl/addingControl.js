@@ -182,6 +182,7 @@ const addEmployeeToDatabase = async (req, res) => {
     const password = generatePassword(employeeName, contactEmail);
     console.log(req.employeeID);
     console.log('dfghjkl', employeeID);
+    console.log(password);
     const securityPass = await hashPassword(password);
 
     const newEmployee = new Employees({

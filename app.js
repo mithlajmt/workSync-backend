@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const register = require('./routes/companies/register');
 const employee = require('./routes/companies/empoyee');
 const department = require('./routes/companies/department');
+const attendence = require('./routes/employees/attendence');
 
 dotenv.config(); // Invoke dotenv to load environment variables
 
@@ -32,15 +33,17 @@ db.once('open', () => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use((req, res, next) => {
-  console.log('Raw Request Body:', req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('Raw Request Body:', req.body);
+//   next();
+// });
 
 
 app.use('/', register);
+app.use('/', attendence);
 app.use('/company', employee);
-app.use('company', department);
+app.use('/company', department);
+
 
 // Start the server and listen for incoming requests
 app.listen(port, () => {

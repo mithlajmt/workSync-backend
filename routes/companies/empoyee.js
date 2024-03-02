@@ -1,6 +1,6 @@
 // Require necessary modules
 const express = require('express');
-const upload = require('../../utilities/multer')
+const upload = require('../../utilities/multer');
 
 const {
   validateToken,
@@ -14,7 +14,12 @@ const {
 // eslint-disable-next-line max-len
 const {checkToken, isAdmin}= require('../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
-const {getFullEmployeeList, terminateEmployee, employeeData,editEmployeedata}=require('../../controllers/organisationController/employeesreq');
+const {
+  getFullEmployeeList,
+  terminateEmployee,
+  employeeData,
+  editEmployeedata,
+}=require('../../controllers/organisationController/employeesreq');
 const {employeeExist}=require('../../utilities/employeeUtils');
 
 
@@ -40,7 +45,7 @@ router.get('/employee', [
   getFullEmployeeList,
 ]);
 
-router.delete('/employee', [
+router.delete('/employee/:employeeID', [
   checkToken,
   isAdmin,
   employeeExist,
@@ -60,5 +65,7 @@ router.put('/employee/:employeeID', [
   isAdmin,
   employeeExist,
   editEmployeedata,
-])
+]);
+
+
 module.exports=router;

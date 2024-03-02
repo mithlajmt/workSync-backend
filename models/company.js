@@ -10,6 +10,23 @@ const companySchema = new mongoose.Schema({
     // unique: true,
   },
 
+  // ... other company details ...
+  workingHours: {
+    type: Object,
+    required: true,
+    properties: {
+      startTime: {
+        type: String,
+        description: 'The start time of the working day in HH:MM format.',
+      },
+      endTime: {
+        type: String,
+        description: 'The end time of the working day in HH:MM format.',
+      },
+    },
+  },
+
+
   // Industry (optional)
   industry: String,
 

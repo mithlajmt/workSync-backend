@@ -19,7 +19,7 @@ const getFullEmployeeList = async (req, res) => {
 
 const terminateEmployee = async (req, res) => {
   try {
-    const employeeID = req.query.selected;
+    const employeeID = req.params.employeeID;
     console.log(employeeID);
     const {companyID} = req.user;
     console.log(companyID);
@@ -101,9 +101,19 @@ const editEmployeedata = async (req, res) => {
 };
 
 
+const photo = async (req, res, next)=>{
+  // res.json({
+  //   m:'hi u won'
+  // })
+  console.log('hi')
+  next()
+}
+
+
 module.exports={
   getFullEmployeeList,
   terminateEmployee,
   employeeData,
   editEmployeedata,
+  photo,
 };

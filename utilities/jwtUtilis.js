@@ -1,5 +1,7 @@
 
 const jwt = require('jsonwebtoken');
+
+
 const checkToken = async function(req, res, next) {
   // eslint-disable-next-line max-len
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
@@ -33,6 +35,7 @@ const checkToken = async function(req, res, next) {
   }
 };
 
+
 const isAdmin = async (req, res, next) => {
   const {role} = req.user;
 
@@ -47,10 +50,26 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
+const isAnEmployee = async (req, res, next) => {
+  const {role} = req.user;
+
+  if (role === 'employee' || role ==='departmentHead') {
+    next();
+  } else {
+    console.log('not an employee');
+    res.status(403).json({
+      success: false,
+      // eslint-disable-next-line max-len
+      message: 'Authorization denied. it seems you are not an employee of any firm contact your admin',
+    });
+  }
+};
+
 
 module.exports = {
   checkToken,
   isAdmin,
+  isAnEmployee,
 };
 
 

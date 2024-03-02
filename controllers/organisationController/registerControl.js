@@ -40,10 +40,10 @@ const getOtp = async (req, res, next) => {
   // Generate OTP and handle the result
   try {
     await otpGenerate(formattedContactNumber);
-    next();
+    // next();
     res.json('OTP generated successfully');
   } catch (err) {
-    console.error('Error in OTP generation:', err.message);
+    console.error('Error in OTP generationgggg:', err.message);
     res.status(500).json('Error generating OTP');
   }
 };
@@ -91,6 +91,7 @@ const checkCompanyData = (req, res, next) => {
     contactNumber,
     password,
     confirmPassword,
+    workingHours,
     terms,
   } = req.body;
 
@@ -99,6 +100,7 @@ const checkCompanyData = (req, res, next) => {
   if (!companyName) missingFields.push('companyName');
   if (!contactEmail) missingFields.push('contactEmail');
   if (!contactNumber) missingFields.push('contactNumber');
+  if (!workingHours) missingFields.push('workingTime');
   if (!password) missingFields.push('password');
   if (!confirmPassword) missingFields.push('confirmPassword');
   if (terms === undefined || terms === null) missingFields.push('terms');
@@ -244,7 +246,12 @@ const verifyRegistration = async (req, res) => {
     contactNumber,
     password,
     terms,
+    workingHours,
   } = req.body.otp;
+  console.log(workingHours);
+
+  const startTime = workingHours.split('-')[0];
+  const endTime = workingHours.split('-')[1];
 
   try {
     const companyID = await generateCompanyID(companyName, contactNumber);
@@ -260,6 +267,10 @@ const verifyRegistration = async (req, res) => {
       terms,
       companyID,
       verified,
+      workingHours: {
+        startTime,
+        endTime,
+      },
       role: 'companyAdmin',
     });
 
