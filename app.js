@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const register = require('./routes/companies/register');
 const employee = require('./routes/companies/empoyee');
 const department = require('./routes/companies/department');
-const attendence = require('./routes/employees/attendence');
+const attendance = require('./routes/employees/attendence');
 
 dotenv.config(); // Invoke dotenv to load environment variables
 
@@ -40,7 +40,7 @@ app.use(express.urlencoded({extended: true}));
 
 
 app.use('/', register);
-app.use('/', attendence);
+app.use('/attendance', attendance);
 app.use('/company', employee);
 app.use('/company', department);
 

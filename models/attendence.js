@@ -12,7 +12,7 @@ const attendanceSchema = new mongoose.Schema({
   },
   Image: {
     type: String,
-    required: [true, 'Please mark your attendance!'],
+    // required: [true, 'Please mark your attendance!'],
   },
   date: {
     type: Date,

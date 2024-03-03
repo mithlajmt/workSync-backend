@@ -1,7 +1,7 @@
-const employee = require('./../../models/employee');
+/* eslint-disable max-len */
 const Attendance = require('../../models/attendence');
 const Company = require('./../../models/company');
-const { DateTime } = require('luxon');
+const {DateTime} = require('luxon');
 
 // Middleware to check if it's a working day (not Sunday)
 const checkWorkingDay = async (req, res, next) => {
@@ -9,6 +9,7 @@ const checkWorkingDay = async (req, res, next) => {
   if (today === 0) {
     // Sunday, cannot mark attendance
     res.status(400).json({
+      // eslint-disable-next-line max-len
       message: 'Attendance cannot be marked today; it\'s Sunday. Enjoy your holiday.',
     });
   } else {
@@ -28,10 +29,10 @@ const validateCheckIn = async (req, res, next) => {
 
   try {
     // Extract company ID from the request user object
-    const { companyID } = req.user;
+    const {companyID} = req.user;
 
     // Find the company with the provided ID
-    const company = await Company.findOne({ companyID });
+    const company = await Company.findOne({companyID});
 
     if (company) {
       // Extract start and end time strings from company working hours
@@ -44,28 +45,28 @@ const validateCheckIn = async (req, res, next) => {
 
       // Adjust starting time to allow check-ins one hour early
       const startingTime = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        startTimeArray[0],
-        startTimeArray[1]
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          startTimeArray[0],
+          startTimeArray[1],
       );
 
       // Create ending time object
       const endingTime = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        endTimeArray[0],
-        endTimeArray[1]
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          endTimeArray[0],
+          endTimeArray[1],
       );
 
       // Get current time in milliseconds (replace with appropriate logic)
-      const currentTime = new Date().getTime(); // Replace with logic to get the current time in milliseconds
-
+      const currentTime = new Date().getTime();
       // Log formatted start, end, and current times (optional)
       console.log('Starting Time:', startingTime.toLocaleString('en-IN'));
       console.log('Ending Time:', endingTime.toLocaleString('en-IN'));
+      // eslint-disable-next-line max-len
       console.log('Current Time:', new Date(currentTime).toLocaleString('en-IN', IST_OPTIONS));
 
       // Check if current time is within allowed work timeframe (including buffer)
@@ -82,20 +83,20 @@ const validateCheckIn = async (req, res, next) => {
       }
     } else {
       console.log('Company not found.');
-      res.status(404).json({ success: false, message: 'Company not found.', reason: 'Invalid company ID.' });
+      res.status(404).json({success: false, message: 'Company not found.', reason: 'Invalid company ID.'});
     }
   } catch (err) {
     console.log(err); // Log any errors
-    res.status(500).json({ success: false, message: 'Internal Server Error', reason: 'Something went wrong on the server.' });
+    res.status(500).json({success: false, message: 'Internal Server Error', reason: 'Something went wrong on the server.'});
   }
 };
 
 // Middleware to check if the user has already checked in on the current day
 const checkStatus = async (req, res, next) => {
   try {
-    const { companyID, employeeID } = req.user;
+    const {employeeID} = req.user;
     const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
-    const user = await Attendance.findOne({ employeeID, date: currentDate });
+    const user = await Attendance.findOne({employeeID, date: currentDate});
 
     if (user) {
       const checkIn = await user.checkIn;
@@ -111,7 +112,7 @@ const checkStatus = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "Unexpected error. User status check failed. Please try again later.",
+      message: 'Unexpected error. User status check failed. Please try again later.',
     });
   }
 };
@@ -119,19 +120,19 @@ const checkStatus = async (req, res, next) => {
 // Controller to submit employee attendance
 const submitAttendance = async (req, res) => {
   try {
-    const { department, role, companyID, employeeID } = req.user;
-    const Image = req.file.location;
+    const {role, companyID, employeeID} = req.user;
+    // const Image = req.file.location;
     const today = new Date();
     const formattedTime = today.toLocaleTimeString();
-    const company = await Company.findOne({ companyID });
-    const formattedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const company = await Company.findOne({companyID});
+    // const formattedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     if (company) {
       const startTime = company.workingHours.startTime;
       const parsedStartTime = new Date().setHours(
-        parseInt(startTime.split(':')[0]), // Extract hours
-        parseInt(startTime.split(':')[1]), // Extract minutes
-        0 // Set seconds and milliseconds to 0 for accurate comparison
+          parseInt(startTime.split(':')[0]), // Extract hours
+          parseInt(startTime.split(':')[1]), // Extract minutes
+          0, // Set seconds and milliseconds to 0 for accurate comparison
       );
 
       const now = DateTime.now();
@@ -145,7 +146,7 @@ const submitAttendance = async (req, res) => {
       const attendance = new Attendance({
         companyID,
         employeeID,
-        Image,
+        // Image,
         checkIn: formattedTime,
         date: formattedDate,
         role,
@@ -154,6 +155,7 @@ const submitAttendance = async (req, res) => {
 
       await attendance.save();
       res.status(200).json({
+        success: true,
         message: 'Attendance submitted successfully.',
       });
     }
@@ -162,9 +164,96 @@ const submitAttendance = async (req, res) => {
   }
 };
 
+
+// GET ATTENDANCESTATUS OF THE DAY
+
+const getAttendenceStatus = async (req, res) => {
+  const { employeeID } = req.user;
+  const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+
+  try {
+    const status = await Attendance.findOne({ employeeID, date: currentDate });
+
+    if (status) {
+      if (status.checkOut) {
+        // Employee has checked out
+        res.status(200).json({
+          success: true,
+          checkedIn: false,
+          message: 'Employee has already checked out.',
+        });
+      } else {
+        // Employee has checked in
+        res.status(200).json({
+          success: true,
+          checkedIn: true,
+          message: 'Employee has checked in.',
+        });
+      }
+    } else {
+      // No attendance record found for the current date
+      res.status(200).json({
+        success: true,
+        checkedIn: false,
+        message: 'No attendance record found for the current date.',
+      });
+    }
+  } catch (err) {
+    // Internal server error
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error or something seems off.',
+    });
+  }
+};
+
+
+
+const checkInExists = async (req, res, next)=>{
+  const {employeeID} = req.user;
+  const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+  console.log(currentDate);
+
+  const log = await Attendance.findOne({employeeID, date: currentDate});
+  if (!log) {
+    res.status(400).json({
+      success: false,
+      message: 'user hasnt checked in today ! checkIn first and retry',
+    });
+  } else {
+    next();
+  } 
+};
+
+const registerCheckOut = async (req, res, next) => {
+  try {
+    const {employeeID} = req.user;
+    const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+    const checkOut = new Date().toLocaleTimeString(); // Added parentheses to call the function
+
+    const query = {employeeID, date: currentDate};
+    const update = {$set: {checkOut: checkOut}};
+    const options = {new: true};
+
+    const attendance = await Attendance.findOneAndUpdate(query, update, options);
+    console.log(attendance);
+
+    if (!attendance) {
+      res.status(404).json({success: false, message: 'Check-in record not found'});
+    } else {
+      res.json({success: true, message: 'Check-out successful'});
+    }
+  } catch (err) {
+    console.error('Error during check-out:', err);
+    res.status(500).json({success: false, message: 'Internal Server Error'});
+  }
+};
 module.exports = {
   submitAttendance,
   validateCheckIn,
   checkWorkingDay,
   checkStatus,
+  getAttendenceStatus,
+  checkInExists,
+  registerCheckOut,
 };

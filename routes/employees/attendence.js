@@ -4,18 +4,33 @@ const router = express.Router();
 
 const {checkToken, isAnEmployee}=require('../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
-const {submitAttendance,validateCheckIn,checkStatus,checkWorkingDay}=require('../../controllers/employeeControl/attendence');
-const upload = require('./../../utilities/multer')
+const {submitAttendance, validateCheckIn, checkStatus, checkWorkingDay, getAttendenceStatus,checkInExists,registerCheckOut}=require('../../controllers/employeeControl/attendence');
+const upload = require('./../../utilities/multer');
 
 
-router.post('/attendence', [
+router.post('/checkIn', [
   checkToken,
   isAnEmployee,
-  checkWorkingDay,
+  // checkWorkingDay,
   validateCheckIn,
   checkStatus,
-  upload.single('photo'),
+  // upload.single('photo'),
   submitAttendance,
+]);
+
+router.post('/checkOut', [
+  checkToken,
+  isAnEmployee,
+  // checkWorkingDay,
+  checkInExists,
+  // upload.single('photo'),
+  registerCheckOut,
+]);
+
+router.get('/status', [
+  checkToken,
+  isAnEmployee,
+  getAttendenceStatus,
 ]);
 
 module.exports = router;
