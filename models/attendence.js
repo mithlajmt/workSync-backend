@@ -21,7 +21,7 @@ const attendanceSchema = new mongoose.Schema({
   checkIn: {
     type: String,
     // eslint-disable-next-line max-len
-    required: [true, 'hmm.. something seems off try checkin again we couldnt get checkIn time'],
+    required: [false, 'hmm.. something seems off try checkin again we couldnt get checkIn time'],
   },
   checkOut: {
     type: String,
@@ -37,6 +37,12 @@ const attendanceSchema = new mongoose.Schema({
     required: [true, 'Please provide your role'],
     enum: ['employee', 'departmentHead'],
   },
+  status: {
+    type: String,
+    required: [true, 'Please provide the status of the day'],
+    enum: ['present', 'late', 'leave'],
+  },
+
 
 });
 

@@ -8,6 +8,9 @@ const register = require('./routes/companies/register');
 const employee = require('./routes/companies/empoyee');
 const department = require('./routes/companies/department');
 const attendance = require('./routes/employees/attendence');
+// eslint-disable-next-line no-unused-vars
+const cron = require('./utilities/autoCheckOut-nodechron');
+
 
 dotenv.config(); // Invoke dotenv to load environment variables
 

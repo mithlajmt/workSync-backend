@@ -136,12 +136,22 @@ const submitAttendance = async (req, res) => {
       );
 
       const now = DateTime.now();
-      const formattedDate = now.toFormat('dd/MM/yyyy');
+      const formattedDate = now.toFormat('yyyy/MM/dd');
       console.log(formattedDate);
       const timeDifference = Math.floor((today - parsedStartTime) / (1000 * 60)); // Convert milliseconds to minutes
       console.log(timeDifference);
 
       const isLate = timeDifference > 10;
+      let status;
+      function getStatus() {
+        if (isLate) {
+          return status = 'late';
+        } else {
+          return status = 'present';
+        }
+      }
+      getStatus();
+      console.log(status);
 
       const attendance = new Attendance({
         companyID,
@@ -151,6 +161,7 @@ const submitAttendance = async (req, res) => {
         date: formattedDate,
         role,
         isLate,
+        status,
       });
 
       await attendance.save();
@@ -168,11 +179,11 @@ const submitAttendance = async (req, res) => {
 // GET ATTENDANCESTATUS OF THE DAY
 
 const getAttendenceStatus = async (req, res) => {
-  const { employeeID } = req.user;
-  const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+  const {employeeID} = req.user;
+  const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
 
   try {
-    const status = await Attendance.findOne({ employeeID, date: currentDate });
+    const status = await Attendance.findOne({employeeID, date: currentDate});
 
     if (status) {
       if (status.checkOut) {
@@ -208,10 +219,9 @@ const getAttendenceStatus = async (req, res) => {
 };
 
 
-
 const checkInExists = async (req, res, next)=>{
   const {employeeID} = req.user;
-  const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+  const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
   console.log(currentDate);
 
   const log = await Attendance.findOne({employeeID, date: currentDate});
@@ -222,13 +232,13 @@ const checkInExists = async (req, res, next)=>{
     });
   } else {
     next();
-  } 
+  }
 };
 
 const registerCheckOut = async (req, res, next) => {
   try {
     const {employeeID} = req.user;
-    const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+    const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
     const checkOut = new Date().toLocaleTimeString(); // Added parentheses to call the function
 
     const query = {employeeID, date: currentDate};
@@ -248,6 +258,58 @@ const registerCheckOut = async (req, res, next) => {
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 };
+
+const attendanceType = async (req, res) => {
+  const { employeeID} = req.user;
+  try {
+    const details = await Attendance.aggregate([
+      {
+        $match: {
+          employeeID: employeeID,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          title: '',
+          date: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$date',
+              timezone: 'Asia/Kolkata',
+            },
+          },
+          color: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$status', 'leave'] }, then: 'red' },
+                { case: { $eq: ['$status', 'present'] }, then: 'green' },
+                { case: { $eq: ['$status', 'late'] }, then: 'yellow' },
+              ],
+              default: 'defaultColor',
+            },
+          },
+        },
+      },
+    ]);
+
+    console.log(details);
+
+    res.status(200).json({
+      success: true,
+      data: details,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+
+
 module.exports = {
   submitAttendance,
   validateCheckIn,
@@ -256,4 +318,5 @@ module.exports = {
   getAttendenceStatus,
   checkInExists,
   registerCheckOut,
+  attendanceType,
 };

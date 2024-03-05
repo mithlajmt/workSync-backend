@@ -1,11 +1,9 @@
 /* eslint-disable max-len */
 const cron = require('node-cron');
-const Attendance = require('./../models/attendance');
+const Attendance = require('./../models/attendence');
 
 const checkOutEmployees = async () => {
-    console.log('hi');
   try {
-
     // Find overdue employees without checking out
     const overdueEmployees = await Attendance.find({checkOut: {$exists: false}});
 
@@ -26,12 +24,16 @@ const checkOutEmployees = async () => {
   }
 };
 
-// Schedule the cron job to run every day at 3 AM
-// cron.schedule('*/1 * * * * *', async () => {
-//     // await checkOutEmployees();
-//     console.log('jo');
-// });
 
-cron.schedule('* * * * *', () => {
-    console.log('running a task every minute');
-  });
+// Schedule the cron job to run every day at 3 AM
+cron.schedule('0 23 * * 1-6', async () => {
+  await checkOutEmployees();
+    console.log('jo');
+});
+
+// cron.schedule('* * * * *', () => {
+//     console.log('running a task every minute');
+//   });
+
+
+module.exports = cron;
