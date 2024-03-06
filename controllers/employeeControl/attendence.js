@@ -5,14 +5,15 @@ const {DateTime} = require('luxon');
 
 // Middleware to check if it's a working day (not Sunday)
 const checkWorkingDay = async (req, res, next) => {
+  // Check the day of the week
   const today = new Date().getDay();
   if (today === 0) {
-    // Sunday, cannot mark attendance
+    // If it's Sunday, prevent attendance marking
     res.status(400).json({
-      // eslint-disable-next-line max-len
       message: 'Attendance cannot be marked today; it\'s Sunday. Enjoy your holiday.',
     });
   } else {
+    // Continue to the next middleware if it's a working day
     next();
   }
 };
@@ -63,10 +64,10 @@ const validateCheckIn = async (req, res, next) => {
 
       // Get current time in milliseconds (replace with appropriate logic)
       const currentTime = new Date().getTime();
+
       // Log formatted start, end, and current times (optional)
       console.log('Starting Time:', startingTime.toLocaleString('en-IN'));
       console.log('Ending Time:', endingTime.toLocaleString('en-IN'));
-      // eslint-disable-next-line max-len
       console.log('Current Time:', new Date(currentTime).toLocaleString('en-IN', IST_OPTIONS));
 
       // Check if current time is within allowed work timeframe (including buffer)
@@ -94,18 +95,22 @@ const validateCheckIn = async (req, res, next) => {
 // Middleware to check if the user has already checked in on the current day
 const checkStatus = async (req, res, next) => {
   try {
+    // Extract employee ID and current date
     const {employeeID} = req.user;
     const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+
+    // Find attendance record for the current user and date
     const user = await Attendance.findOne({employeeID, date: currentDate});
 
     if (user) {
+      // If user has already checked in, prevent duplicate check-ins
       const checkIn = await user.checkIn;
-
       res.status(400).json({
         success: false,
         message: `User has already checked in today at ${checkIn}. Please check out and try again tomorrow.`,
       });
     } else {
+      // Continue to the next middleware if user hasn't checked in yet
       next();
     }
   } catch (error) {
@@ -120,14 +125,14 @@ const checkStatus = async (req, res, next) => {
 // Controller to submit employee attendance
 const submitAttendance = async (req, res) => {
   try {
+    // Extract user details and current date/time
     const {role, companyID, employeeID} = req.user;
-    // const Image = req.file.location;
     const today = new Date();
     const formattedTime = today.toLocaleTimeString();
     const company = await Company.findOne({companyID});
-    // const formattedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     if (company) {
+      // Extract company working hours and start time
       const startTime = company.workingHours.startTime;
       const parsedStartTime = new Date().setHours(
           parseInt(startTime.split(':')[0]), // Extract hours
@@ -135,36 +140,35 @@ const submitAttendance = async (req, res) => {
           0, // Set seconds and milliseconds to 0 for accurate comparison
       );
 
-      const now = DateTime.now();
-      const formattedDate = now.toFormat('yyyy/MM/dd');
-      console.log(formattedDate);
-      const timeDifference = Math.floor((today - parsedStartTime) / (1000 * 60)); // Convert milliseconds to minutes
-      console.log(timeDifference);
+      // Calculate time difference in minutes from start time
+      const timeDifference = Math.floor((today - parsedStartTime) / (1000 * 60));
 
+      // Determine if the user is late
       const isLate = timeDifference > 10;
-      let status;
-      function getStatus() {
-        if (isLate) {
-          return status = 'late';
-        } else {
-          return status = 'present';
-        }
-      }
-      getStatus();
-      console.log(status);
 
+      // Determine attendance status based on presence or lateness
+      let status;
+      if (isLate) {
+        status = 'late';
+      } else {
+        status = 'present';
+      }
+
+      // Create Attendance record
       const attendance = new Attendance({
         companyID,
         employeeID,
-        // Image,
         checkIn: formattedTime,
-        date: formattedDate,
+        date: today.toLocaleDateString(),
         role,
         isLate,
         status,
       });
 
+      // Save the attendance record
       await attendance.save();
+
+      // Respond with success message
       res.status(200).json({
         success: true,
         message: 'Attendance submitted successfully.',
@@ -172,29 +176,74 @@ const submitAttendance = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 };
 
+// Middleware to check if the user has already checked in on the current day
+const checkInExists = async (req, res, next) => {
+  const {employeeID} = req.user;
+  const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
+  console.log(currentDate);
 
-// GET ATTENDANCESTATUS OF THE DAY
+  const log = await Attendance.findOne({employeeID, date: currentDate});
+  if (!log) {
+    res.status(400).json({
+      success: false,
+      message: 'User hasn\'t checked in today! Check in first and retry.',
+    });
+  } else {
+    next();
+  }
+};
 
-const getAttendenceStatus = async (req, res) => {
+// Middleware to register employee check-out
+const registerCheckOut = async (req, res, next) => {
+  try {
+    // Extract employee ID and current date
+    const {employeeID} = req.user;
+    const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
+    const checkOut = new Date().toLocaleTimeString();
+
+    // Define MongoDB query, update, and options for check-out
+    const query = {employeeID, date: currentDate};
+    const update = {$set: {checkOut: checkOut}};
+    const options = {new: true};
+
+    // Find and update the attendance record
+    const attendance = await Attendance.findOneAndUpdate(query, update, options);
+    console.log(attendance);
+
+    // Respond with success message
+    if (!attendance) {
+      res.status(404).json({success: false, message: 'Check-in record not found'});
+    } else {
+      res.json({success: true, message: 'Check-out successful'});
+    }
+  } catch (err) {
+    console.error('Error during check-out:', err);
+    res.status(500).json({success: false, message: 'Internal Server Error'});
+  }
+};
+
+// Controller to get attendance status of the day
+const getAttendanceStatus = async (req, res) => {
   const {employeeID} = req.user;
   const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
 
   try {
+    // Find attendance record for the current user and date
     const status = await Attendance.findOne({employeeID, date: currentDate});
 
     if (status) {
+      // Respond with checked-in or checked-out status
       if (status.checkOut) {
-        // Employee has checked out
         res.status(200).json({
           success: true,
           checkedIn: false,
           message: 'Employee has already checked out.',
         });
       } else {
-        // Employee has checked in
         res.status(200).json({
           success: true,
           checkedIn: true,
@@ -218,50 +267,11 @@ const getAttendenceStatus = async (req, res) => {
   }
 };
 
-
-const checkInExists = async (req, res, next)=>{
-  const {employeeID} = req.user;
-  const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
-  console.log(currentDate);
-
-  const log = await Attendance.findOne({employeeID, date: currentDate});
-  if (!log) {
-    res.status(400).json({
-      success: false,
-      message: 'user hasnt checked in today ! checkIn first and retry',
-    });
-  } else {
-    next();
-  }
-};
-
-const registerCheckOut = async (req, res, next) => {
-  try {
-    const {employeeID} = req.user;
-    const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
-    const checkOut = new Date().toLocaleTimeString(); // Added parentheses to call the function
-
-    const query = {employeeID, date: currentDate};
-    const update = {$set: {checkOut: checkOut}};
-    const options = {new: true};
-
-    const attendance = await Attendance.findOneAndUpdate(query, update, options);
-    console.log(attendance);
-
-    if (!attendance) {
-      res.status(404).json({success: false, message: 'Check-in record not found'});
-    } else {
-      res.json({success: true, message: 'Check-out successful'});
-    }
-  } catch (err) {
-    console.error('Error during check-out:', err);
-    res.status(500).json({success: false, message: 'Internal Server Error'});
-  }
-};
-
+// Controller to get attendance type details for a user
 const attendanceType = async (req, res) => {
-  const { employeeID} = req.user;
+  const {employeeID} = req.user;
   try {
+    // Aggregate query to get attendance details
     const details = await Attendance.aggregate([
       {
         $match: {
@@ -282,9 +292,9 @@ const attendanceType = async (req, res) => {
           color: {
             $switch: {
               branches: [
-                { case: { $eq: ['$status', 'leave'] }, then: 'red' },
-                { case: { $eq: ['$status', 'present'] }, then: 'green' },
-                { case: { $eq: ['$status', 'late'] }, then: 'yellow' },
+                {case: {$eq: ['$status', 'leave']}, then: 'red'},
+                {case: {$eq: ['$status', 'present']}, then: 'green'},
+                {case: {$eq: ['$status', 'late']}, then: 'yellow'},
               ],
               default: 'defaultColor',
             },
@@ -295,12 +305,14 @@ const attendanceType = async (req, res) => {
 
     console.log(details);
 
+    // Respond with the attendance details
     res.status(200).json({
       success: true,
       data: details,
     });
   } catch (err) {
     console.error(err);
+    // Internal server error
     res.status(500).json({
       success: false,
       error: 'Internal Server Error',
@@ -308,14 +320,13 @@ const attendanceType = async (req, res) => {
   }
 };
 
-
-
+// Export the controllers and middlewares
 module.exports = {
   submitAttendance,
   validateCheckIn,
   checkWorkingDay,
   checkStatus,
-  getAttendenceStatus,
+  getAttendanceStatus,
   checkInExists,
   registerCheckOut,
   attendanceType,
