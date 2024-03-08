@@ -69,6 +69,7 @@ const checkData = async (req, res) => {
             companyID,
             contactEmail,
             employeeID,
+            companyID,
             _id,
             role,
           };

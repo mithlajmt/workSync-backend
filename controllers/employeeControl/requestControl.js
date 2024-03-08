@@ -31,9 +31,9 @@ const validateFields = async (req, res, next) => {
  * Saves the complaint to the database and responds with success or error messages.
  */
 const registerComplaint = async (req, res) => {
-  const { companyID, employeeID } = req.user;
-  
-  const { title, description, recipient } = req.body;
+  const {companyID, employeeID} = req.user;
+
+  const {title, description, recipient} = req.body;
   const attachment = req.file;
 
   try {

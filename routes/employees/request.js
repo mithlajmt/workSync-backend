@@ -1,4 +1,5 @@
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const {checkToken, isAnEmployee}=require('./../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
@@ -13,5 +14,4 @@ router.post('/complaints', [
   validateFields,
   registerComplaint,
 ]);
-
 module.exports = router;

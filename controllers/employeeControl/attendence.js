@@ -29,7 +29,7 @@ const validateCheckIn = async (req, res, next) => {
   };
 
   try {
-    // Extract company ID from the request user object
+    // Extract company ID from the request user objecty
     const {companyID} = req.user;
 
     // Find the company with the provided ID
@@ -97,14 +97,17 @@ const checkStatus = async (req, res, next) => {
   try {
     // Extract employee ID and current date
     const {employeeID} = req.user;
-    const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+    const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
+    console.log(currentDate);
 
     // Find attendance record for the current user and date
     const user = await Attendance.findOne({employeeID, date: currentDate});
+    // console.log(currentDate, employeeID);
+    // console.log(user);
 
     if (user) {
       // If user has already checked in, prevent duplicate check-ins
-      const checkIn = await user.checkIn;
+      const checkIn = user.checkIn;
       res.status(400).json({
         success: false,
         message: `User has already checked in today at ${checkIn}. Please check out and try again tomorrow.`,
@@ -130,6 +133,8 @@ const submitAttendance = async (req, res) => {
     const today = new Date();
     const formattedTime = today.toLocaleTimeString();
     const company = await Company.findOne({companyID});
+    const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
+
 
     if (company) {
       // Extract company working hours and start time
@@ -159,7 +164,7 @@ const submitAttendance = async (req, res) => {
         companyID,
         employeeID,
         checkIn: formattedTime,
-        date: today.toLocaleDateString(),
+        date: currentDate, //cgnged
         role,
         isLate,
         status,

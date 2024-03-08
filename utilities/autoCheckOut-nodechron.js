@@ -28,7 +28,6 @@ const checkOutEmployees = async () => {
 // Schedule the cron job to run every day at 3 AM
 cron.schedule('0 23 * * 1-6', async () => {
   await checkOutEmployees();
-    console.log('jo');
 });
 
 // cron.schedule('* * * * *', () => {

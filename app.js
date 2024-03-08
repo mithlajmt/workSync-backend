@@ -9,6 +9,7 @@ const employee = require('./routes/companies/empoyee');
 const department = require('./routes/companies/department');
 const attendance = require('./routes/employees/attendence');
 const requests = require('./routes/employees/request');
+const commonReq = require('./routes/common/commonRequest');
 // eslint-disable-next-line no-unused-vars
 const cron = require('./utilities/autoCheckOut-nodechron');
 
@@ -45,7 +46,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/', register);
 app.use('/attendance', attendance);
-app.use('/', requests);
+app.use('/', requests, commonReq);
 app.use('/company', employee);
 app.use('/company', department);
 
