@@ -2,6 +2,8 @@
 const Attendance = require('../../models/attendence');
 const Company = require('./../../models/company');
 const {DateTime} = require('luxon');
+const {getDatesBetween}=require('./../../utilities/dateUtility');
+const LeaveRequest = require('./../../models/leaveRequest');
 
 // Middleware to check if it's a working day (not Sunday)
 const checkWorkingDay = async (req, res, next) => {
@@ -164,7 +166,7 @@ const submitAttendance = async (req, res) => {
         companyID,
         employeeID,
         checkIn: formattedTime,
-        date: currentDate, //cgnged
+        date: currentDate, // cgnged
         role,
         isLate,
         status,
@@ -301,15 +303,12 @@ const attendanceType = async (req, res) => {
                 {case: {$eq: ['$status', 'present']}, then: 'green'},
                 {case: {$eq: ['$status', 'late']}, then: 'yellow'},
               ],
-              default: 'defaultColor',
+              default: 'black',
             },
           },
         },
       },
     ]);
-
-    console.log(details);
-
     // Respond with the attendance details
     res.status(200).json({
       success: true,
@@ -325,6 +324,86 @@ const attendanceType = async (req, res) => {
   }
 };
 
+// Middleware to validate leave days
+const validateLeaveDays = async (req, res, next) => {
+  try {
+    const {start, end} = req.body;
+    const startd = new Date(start);
+    const endt = new Date(end);
+
+    if (startd <= endt) {
+      // If start date is less than or equal to end date, proceed to the next middleware or route handler
+      next();
+    } else {
+      // If start is not less than or equal to end, send a bad request response
+      res.status(400).json({
+        success: false,
+        error: 'Start date must be less than or equal to end date',
+      });
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+// Route handler to register a leave request
+const registerLeaveRequest = async (req, res) => {
+  try {
+    // Extract necessary information from the request
+    const {employeeID} = req.user;
+    const {title, description, start, end} = req.body;
+    const attachment = req.file;
+
+    // Assuming getDatesBetween is a function that returns an array of dates
+    const requestedDates = getDatesBetween(start, end);
+
+    // Check if the requestedDates array is empty
+    if (requestedDates.length < 1) {
+      return res.status(400).json({
+        success: false,
+        error: 'No valid dates found for the leave request. Please check your date range.',
+      });
+    }
+
+    // Continue with the rest of your logic if there are requestedDates
+    // ...
+
+
+    // Create a new LeaveRequest document
+    const newLeaveRequest = new LeaveRequest({
+      title,
+      description,
+      attachment,
+      date: new Date(), // Current date
+      requestedDates,
+      employeeID,
+    });
+
+    // Save the newLeaveRequest document to the database
+    await newLeaveRequest.save();
+
+    // Respond with a success message and the created leave request data
+    res.status(201).json({
+      success: true,
+      data: '',
+      message: 'Your leave request has been successfully submitted for review.',
+    });
+  } catch (error) {
+    // Handle unexpected errors
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+
 // Export the controllers and middlewares
 module.exports = {
   submitAttendance,
@@ -335,4 +414,6 @@ module.exports = {
   checkInExists,
   registerCheckOut,
   attendanceType,
+  validateLeaveDays,
+  registerLeaveRequest,
 };

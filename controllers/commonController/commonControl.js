@@ -1,5 +1,6 @@
 const company = require('./../../models/company');
 const employee = require('./../../models/employee');
+const complaint = require('./../../models/complaint')
 
 const userData = async (req, res) => {
   try {
@@ -92,6 +93,11 @@ const userData = async (req, res) => {
     });
   }
 };
+
+const registerComplaint = async(req, res)=>{
+  const employeeID = req.user;
+  // const {title,}
+}
 
 module.exports = {
   userData,
