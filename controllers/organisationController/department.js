@@ -107,9 +107,53 @@ const storeDepartment = async (req, res, next)=>{
   }
 };
 
+const getDepartmentsNames = async (req, res) => {
+  try {
+    const {companyID} = req.user;
+
+    // Use 'await' to handle the asynchronous operation
+    const departmentsData = await Department.aggregate([
+      {
+        $match: {
+          companyID: companyID,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          name: '$departmentName',
+        },
+      },
+    ]);
+
+    if (departmentsData.length === 0) {
+      // Return a meaningful response when no departments are found
+      return res.status(404).json({
+        success: false,
+        message: 'No departments found for the company at the moment.',
+      });
+    }
+
+    // Return the successful response with data
+    res.status(200).json({
+      success: true,
+      data: departmentsData,
+    });
+  } catch (error) {
+    // Handle unexpected errors and return a clear error response
+    console.error('Error in getDepartmentsNames:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error. Please try again later.',
+    });
+  }
+};
+
+
 module.exports = {
   validateToken,
   checkRole,
   checkExisting,
   storeDepartment,
+  getDepartmentsNames,
 };

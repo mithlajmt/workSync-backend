@@ -46,7 +46,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/', register);
 app.use('/attendance', attendance);
-app.use('/', requests, commonReq);
+app.use('/', requests, commonReq, department);
 app.use('/company', employee);
 app.use('/company', department);
 
