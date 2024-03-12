@@ -42,6 +42,10 @@ const attendanceSchema = new mongoose.Schema({
     required: [true, 'Please provide the status of the day'],
     enum: ['present', 'late', 'leave'],
   },
+  department: {
+    type: String,
+    required: [true, 'Please provide Department Name'],
+  },
 
 
 });

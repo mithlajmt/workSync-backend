@@ -7,6 +7,8 @@ const {
   checkExisting,
   storeDepartment,
   getDepartmentsNames,
+  getDepartments,
+  generateDepartmentID,
 }= require('../../controllers/organisationController/department');
 
 
@@ -15,6 +17,7 @@ router.post('/department',
       validateToken,
       checkRole,
       checkExisting,
+      generateDepartmentID,
       storeDepartment,
     ],
 );
@@ -24,6 +27,15 @@ router.get('/departmentNames',
       validateToken,
       checkRole,
       getDepartmentsNames,
+    ],
+);
+
+router.get('/department',
+    [
+      validateToken,
+      checkRole,
+      getDepartments,
+
     ],
 );
 

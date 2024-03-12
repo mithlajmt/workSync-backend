@@ -86,13 +86,14 @@ const checkExisting = async (req, res, next) => {
 const storeDepartment = async (req, res, next)=>{
   try {
     const {departmentName, description, budgetAllocation: budget} = req.body;
-    const {companyID} = req.user;
+    const {companyID, departmentID} = req.user;
 
     const newDepartment = new Department({
       departmentName,
       description,
       companyID,
       budget,
+      departmentID,
     });
 
     await newDepartment.save();
@@ -106,6 +107,41 @@ const storeDepartment = async (req, res, next)=>{
     res.status(500).json({success: false, message: 'Internal Server Error while adding employee to database'});
   }
 };
+
+const generateDepartmentID = async (req, res, next) => {
+  try {
+    const {companyID} = req.user;
+    const {departmentName} = req.body;
+
+    // Extract the last two letters of companyID
+    const lastTwoCompanyID = companyID.slice(-2);
+
+    // Extract the first two letters of departmentName
+    const firstTwoDepartmentName = departmentName.slice(0, 2);
+
+    // Generate two random characters
+    const randomChars = Math.random().toString(36).substring(2, 4);
+
+    // Combine the extracted and random values to create a unique ID
+    // eslint-disable-next-line max-len
+    const departmentID = `${lastTwoCompanyID}${firstTwoDepartmentName}${randomChars}`;
+
+    // Use the generated departmentID as needed
+    // console.log(`Generated Department ID: ${departmentID}`);
+
+    // Send the departmentID in the response or perform other actions
+    req.user.departmentID = departmentID;
+
+    next();
+  } catch (error) {
+    console.error('Error generating department ID:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+};
+
 
 const getDepartmentsNames = async (req, res) => {
   try {
@@ -149,6 +185,94 @@ const getDepartmentsNames = async (req, res) => {
   }
 };
 
+// Define an asynchronous function to fetch department data
+const getDepartments = async (req, res) => {
+  try {
+    // Extracting companyID from the user object in the request
+    const {companyID} = req.user;
+
+    // Creating a new Date object to represent the current date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to the beginning of the day
+
+    // Aggregating data for departments with employee and attendance counts
+    const departmentsSummary = await Department.aggregate([
+      // Stage 1: Match departments based on companyID
+      {$match: {companyID}},
+
+      // Stage 2: Left outer join with employees collection
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'departmentName',
+          foreignField: 'department',
+          as: 'employees',
+        },
+      },
+
+      // Stage 3: Left outer join with attendances collection
+      {
+        $lookup: {
+          from: 'attendances',
+          let: {departmentName: '$departmentName'},
+          pipeline: [
+            // eslint-disable-next-line max-len
+            // Sub-pipeline: Match attendance records for today's date and the current department
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {$eq: ['$department', '$$departmentName']},
+                    // eslint-disable-next-line max-len
+                    {$gte: ['$date', today]}, // Filter for today's date or later
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'attendance',
+        },
+      },
+
+      // Stage 4: Project department details and counts
+      // Stage 4: Project department details and counts
+      {
+        $project: {
+          departmentName: 1,
+          departmentID: 1, // Include departmentID in the projection
+          totalEmployees: {$size: '$employees'},
+          attendancesToday: {$size: '$attendance'},
+        },
+      },
+
+    ]);
+
+    // Log the aggregated departmentsSummary for debugging purposes
+    // console.log(departmentsSummary);
+
+    // Sending the response with the successfully loaded departmentsSummary
+    res.json({
+      success: true,
+      data: departmentsSummary,
+      message: 'Department summary loaded successfully.',
+    });
+  } catch (error) {
+    // Handling errors that may occur during the process
+    console.error('Error fetching department summary:', error);
+    res.status(500).json({
+      success: false,
+      // eslint-disable-next-line max-len
+      message: 'An error occurred while fetching department summary. Try again later.',
+    });
+  }
+};
+
+const getDepartment = async(req, res)=>{
+  // const departmentID = req.params.ID;
+//   console.log(departmentID)
+
+}
+
 
 module.exports = {
   validateToken,
@@ -156,4 +280,7 @@ module.exports = {
   checkExisting,
   storeDepartment,
   getDepartmentsNames,
+  getDepartments,
+  generateDepartmentID,
+  getDepartment,
 };

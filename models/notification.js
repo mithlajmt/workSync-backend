@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
   title: {
@@ -24,13 +24,13 @@ const notificationSchema = new mongoose.Schema({
     required: true,
   },
   recipients: {
-    type: [String], 
+    type: [String],
     default: [],
   },
   priority: {
     type: String,
     enum: ['HIGH', 'MEDIUM', 'LOW'],
-    default: 'MEDIUM',  
+    default: 'MEDIUM',
   },
   companyID: {
     type: String,
@@ -52,4 +52,4 @@ const notificationSchema = new mongoose.Schema({
 
 const Notification = mongoose.model('Notification', notificationSchema);
 
-module.exports= Notification
+module.exports= Notification;

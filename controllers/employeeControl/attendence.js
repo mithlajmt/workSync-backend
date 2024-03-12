@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 const Attendance = require('../../models/attendence');
+const Employees = require('../../models/employee');
 const Company = require('./../../models/company');
 const {DateTime} = require('luxon');
 const {getDatesBetween}=require('./../../utilities/dateUtility');
@@ -135,9 +136,9 @@ const submitAttendance = async (req, res) => {
     const today = new Date();
     const formattedTime = today.toLocaleTimeString();
     const company = await Company.findOne({companyID});
+    const Employee = await Employees.findOne({companyID, employeeID});
     const currentDate = DateTime.now().toFormat('yyyy/MM/dd');
-
-
+    const department = Employee.department;
     if (company) {
       // Extract company working hours and start time
       const startTime = company.workingHours.startTime;
@@ -170,6 +171,7 @@ const submitAttendance = async (req, res) => {
         role,
         isLate,
         status,
+        department,
       });
 
       // Save the attendance record

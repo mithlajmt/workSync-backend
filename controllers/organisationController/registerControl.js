@@ -57,10 +57,10 @@ const otpVerify = async (req, res, next) => {
 
     // Verification check using Twilio's Verify API
     // const verificationCheck = await client.verify.v2.services(serviceSid)
-        // .verificationChecks.create({to: `${countryCode}${formattedContactNumber}`, code: otp});
+    // .verificationChecks.create({to: `${countryCode}${formattedContactNumber}`, code: otp});
     const verificationCheck={
-      status: 'approved'
-    }
+      status: 'approved',
+    };
 
     console.log(verificationCheck.status);
     console.log(verificationCheck);

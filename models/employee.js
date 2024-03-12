@@ -42,6 +42,6 @@ const employeeSchema = new mongoose.Schema({
 // Compound index on email and CompanyID
 // employeeSchema.index({email: 1, CompanyID: 1}, {unique: true});
 
-const Employee = mongoose.model('emps', employeeSchema);
+const Employee = mongoose.model('Employees', employeeSchema);
 
 module.exports = Employee;

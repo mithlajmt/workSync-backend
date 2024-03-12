@@ -12,7 +12,7 @@ const addToCollection = async (req, res, next) => {
       eventType,
     } = req.body;
 
-    const { companyID } = req.user;
+    const {companyID} = req.user;
     const attachment = req.file;
 
     // Create a new instance of the Notification model

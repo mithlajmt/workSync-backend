@@ -65,11 +65,26 @@ const isAnEmployee = async (req, res, next) => {
   }
 };
 
+const isCompanyAdminOrDepartmentHead= async (req, res, next)=>{
+  const {role} = req.user;
+  if (role === 'companyAdmin' || role ==='departmentHead') {
+    next();
+  } else {
+    console.log('didnt have the authority');
+    res.status(403).json({
+      success: false,
+      // eslint-disable-next-line max-len
+      message: 'Authorization denied. it seems you are dont has the authority for the requested data.',
+    });
+  }
+};
+
 
 module.exports = {
   checkToken,
   isAdmin,
   isAnEmployee,
+  isCompanyAdminOrDepartmentHead,
 };
 
 
