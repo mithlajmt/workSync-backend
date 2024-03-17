@@ -10,7 +10,7 @@ const checkRequiredFields = require('./../../utilities/checkRequiredFeilds');
  * Throws an error if any required field is missing.
  */
 const validateFields = async (req, res, next) => {
-  const required = ['title', 'description', 'attachment', 'recipient'];
+  const required = ['title', 'description', 'recipient'];
 
   try {
     // Check for required fields using utility function
@@ -34,7 +34,8 @@ const registerComplaint = async (req, res) => {
   const {companyID, employeeID} = req.user;
 
   const {title, description, recipient} = req.body;
-  const attachment = req.file;
+  const attachment = req.file.location;
+  // console.log(attachment);
 
   try {
     // Create a new Complaint instance

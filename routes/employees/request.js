@@ -10,7 +10,7 @@ const upload = require('./../../utilities/multer');
 router.post('/complaints', [
   checkToken,
   isAnEmployee,
-  upload.single('identityProof'),
+  upload.single('attachment'),
   validateFields,
   registerComplaint,
 ]);

@@ -9,6 +9,7 @@ const {
   getDepartmentsNames,
   getDepartments,
   generateDepartmentID,
+  getDepEmployees,
 }= require('../../controllers/organisationController/department');
 
 
@@ -30,12 +31,20 @@ router.get('/departmentNames',
     ],
 );
 
-router.get('/department',
+router.get('/departments',
     [
       validateToken,
       checkRole,
       getDepartments,
 
+    ],
+);
+
+router.get('/department/:ID',
+    [
+      validateToken,
+      checkRole,
+      getDepEmployees,
     ],
 );
 

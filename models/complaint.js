@@ -9,10 +9,12 @@ const complaintSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Employee ID unavailable'],
   },
-  isReviewed: {
-    type: Boolean,
-    default: false,
+  status: {
+    type: String,
+    enum: ['pending', 'viewed', 'inAction', 'closed'],
+    default: 'pending',
   },
+
   title: {
     type: String,
     required: [true, 'Title is required'],

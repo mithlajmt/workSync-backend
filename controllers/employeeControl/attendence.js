@@ -359,7 +359,7 @@ const registerLeaveRequest = async (req, res) => {
     // Extract necessary information from the request
     const {employeeID} = req.user;
     const {title, description, start, end} = req.body;
-    const attachment = req.file;
+    const attachment = req.file.location;
 
     // Assuming getDatesBetween is a function that returns an array of dates
     const requestedDates = getDatesBetween(start, end);

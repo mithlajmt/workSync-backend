@@ -8,7 +8,7 @@ const validateToken = async (req, res, next) => {
   const secretKey = process.env.JWT_SECRET;
 
   if (!token) {
-    console.log('notoken');
+    // console.log('notoken');
     return res.status(401).json({
       success: false,
       message: 'Authorization header missing, unauthorized access',
@@ -55,7 +55,7 @@ const checkExisting = async (req, res, next) => {
   const {companyID} = req.user;
   const {departmentName} = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   try {
     const existingDep = await Department.findOne({departmentName, companyID});
@@ -267,11 +267,80 @@ const getDepartments = async (req, res) => {
   }
 };
 
-const getDepartment = async(req, res)=>{
-  // const departmentID = req.params.ID;
-//   console.log(departmentID)
+const getDepEmployees = async (req, res, next) => {
+  try {
+    const depID = req.params.ID;
+    // console.log(depID);
 
-}
+    // Get today's date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const depEmp = await Department.aggregate([
+      {
+        $match: {departmentID: depID},
+      },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'departmentName',
+          foreignField: 'department',
+          as: 'employees',
+        },
+      },
+      {
+        $unwind: '$employees', // Unwind the employees array
+      },
+      {
+        $lookup: {
+          from: 'attendances',
+          let: {empId: '$employees.employeeID'},
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {$eq: ['$employeeID', '$$empId']},
+                    {$eq: ['$date', today]}, // Filter for today's date
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'attendance',
+        },
+      },
+      {
+        $unwind: {path: '$attendance', preserveNullAndEmptyArrays: true},
+      },
+      {
+        $group: {
+          _id: '$_id',
+          employees: {
+            $push: {
+              Name: '$employees.employeeName',
+              employeeID: '$employees.employeeID',
+              Email: '$employees.contactEmail',
+              role: '$employees.role',
+              // eslint-disable-next-line max-len
+              attendanceStatus: {$ifNull: ['$attendance.status', 'Absent']}, // Include attendance status or default to 'Absent'
+            },
+          },
+        },
+      },
+    ]);
+
+    // console.log(depEmp);
+    res.status(200).json({
+      success: true,
+      data: depEmp,
+      message: 'employee data of the department fetched succesfully'
+    }); // Send the department employees data as a response
+  } catch (error) {
+    console.error('Error fetching department employees:', error);
+    res.status(500).json({message: 'Internal server error'});
+  }
+};
 
 
 module.exports = {
@@ -282,5 +351,5 @@ module.exports = {
   getDepartmentsNames,
   getDepartments,
   generateDepartmentID,
-  getDepartment,
+  getDepEmployees,
 };

@@ -1,6 +1,6 @@
 const Notification = require('./../../models/notification');
 
-const addToCollection = async (req, res, next) => {
+const addToCollection = async (req, res) => {
   try {
     const {
       title,
@@ -13,7 +13,10 @@ const addToCollection = async (req, res, next) => {
     } = req.body;
 
     const {companyID} = req.user;
-    const attachment = req.file;
+    console.log(req?.file?.location, 'll');
+    const location = req?.file?.location;
+
+    // const attachment = req.file.location;
 
     // Create a new instance of the Notification model
     const newNotification = new Notification({
@@ -25,9 +28,10 @@ const addToCollection = async (req, res, next) => {
       target,
       recipients,
       eventType,
-      attachment,
+      attachment: location,
       isValid: true,
     });
+    // console.log(newNotification);
 
     // Save the newNotification to the database
     await newNotification.save();

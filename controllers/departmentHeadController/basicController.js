@@ -9,12 +9,11 @@ const getDepartment = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Use aggregation pipeline to fetch department data with additional details
+    // Use aggregation pipeline to fetch department data with additional details 
     const departmentData = await Department.aggregate([
       // Stage 1: Match department by ID
       {$match: {departmentID}},
 
-      // Stage 2: Left outer join with employees collection
       {
         $lookup: {
           from: 'employees',
