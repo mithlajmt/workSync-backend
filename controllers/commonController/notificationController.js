@@ -13,7 +13,7 @@ const addToCollection = async (req, res) => {
     } = req.body;
 
     const {companyID} = req.user;
-    console.log(req?.file?.location, 'll');
+    console.log(req?.file?.location);
     const location = req?.file?.location;
 
     // const attachment = req.file.location;
@@ -51,6 +51,48 @@ const addToCollection = async (req, res) => {
   }
 };
 
+
+const getNotificationListCompany = async (req, res) => {
+  try {
+    const {companyID} = req.user;
+
+    // Get current date
+    const currentDate = new Date();
+
+    // Fetch upcoming notifications
+    const upcomingNotifications = await Notification.aggregate([
+      {
+        $match: {
+          companyID: companyID,
+          start: {$gte: currentDate},
+        },
+      },
+    ]);
+
+    // Fetch previous or all notifications
+    const previousOrAllNotifications = await Notification.aggregate([
+      {
+        $match: {
+          companyID: companyID,
+          start: {$lt: currentDate},
+        },
+      },
+    ]);
+
+    // Send response with both types of notifications
+    res.status(200).json({
+      upcomingNotifications: upcomingNotifications,
+      previousOrAllNotifications: previousOrAllNotifications,
+    });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+};
+
+
 module.exports = {
   addToCollection,
+  getNotificationListCompany,
+
 };

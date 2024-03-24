@@ -7,7 +7,7 @@ const getComplaintsList = async (req, res)=>{
 
     const complaintsPipeline = [
       {
-        $match: {companyID, recipient: role, isReviewed: false},
+        $match: {companyID, recipient: role},
       },
       {
         $lookup: {
@@ -27,8 +27,6 @@ const getComplaintsList = async (req, res)=>{
           'recipient': 1,
           'employeedata.employeeName': 1,
           'employeedata.department': 1,
-          // Include other fields you need from the 'complaints' collection
-          // For example: description: 1, status: 1, etc.
         },
       },
     ];

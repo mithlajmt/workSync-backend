@@ -1,13 +1,12 @@
+/* eslint-disable max-len */
 const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
-// eslint-disable-next-line max-len
-const {checkToken, isAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
+const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
 const {userData}= require('./../../controllers/commonController/commonControl');
-// eslint-disable-next-line max-len
+const {getProfileData, updateProfile, profileName}= require('./../../controllers/commonController/profileController');
 const {getComplaintsList}= require('./../../controllers/commonController/complaintsController');
 const upload = require('./../../utilities/multer');
-// eslint-disable-next-line max-len
 const {addToCollection}=require('./../../controllers/commonController/notificationController');
 
 router.get('/userData', [
@@ -18,7 +17,7 @@ router.get('/userData', [
 
 router.post('/notification', [
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   upload.single('attachment'),
   addToCollection,
 ]);
@@ -29,5 +28,26 @@ router.get('/complaintsList', [
   getComplaintsList,
 ]);
 
+router.get('/profile', [
+  checkToken,
+  getProfileData,
+]);
+
+router.patch('/profile', [
+  checkToken,
+  upload.single('image'),
+  updateProfile,
+
+]);
+
+router.get('/profileInfo', [
+  checkToken,
+  profileName,
+]);
+
+router.get('/profileInfo', [
+  checkToken,
+  profileName,
+]);
 
 module.exports = router;

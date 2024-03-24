@@ -53,7 +53,7 @@ const employeeData = async (req, res, next) => {
   try {
     const {companyID} = req.user;
     const employeeID = req.params.employeeID;
-    console.log('hi', employeeID);
+    // console.log('hi', employeeID);
 
     // Assuming `employees` is a model or database collection
     // and you're using async/await for database operations

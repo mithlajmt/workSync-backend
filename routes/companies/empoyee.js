@@ -12,7 +12,7 @@ const {
 } = require('../../controllers/employeeControl/addingControl');
 
 // eslint-disable-next-line max-len
-const {checkToken, isAdmin}= require('../../utilities/jwtUtilis');
+const {checkToken, isCompanyAdmin}= require('../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
 const {
   getFullEmployeeList,
@@ -41,13 +41,13 @@ router.post('/employee', [
 
 router.get('/employee', [
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   getFullEmployeeList,
 ]);
 
 router.delete('/employee/:employeeID', [
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   employeeExist,
   terminateEmployee,
 ]);
@@ -55,14 +55,14 @@ router.delete('/employee/:employeeID', [
 
 router.get('/employee/:employeeID', [
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   employeeExist,
   employeeData,
 ]);
 
 router.put('/employee/:employeeID', [
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   employeeExist,
   editEmployeedata,
 ]);

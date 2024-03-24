@@ -36,7 +36,7 @@ const checkToken = async function(req, res, next) {
 };
 
 
-const isAdmin = async (req, res, next) => {
+const isCompanyAdmin = async (req, res, next) => {
   const {role} = req.user;
 
   if (role === 'companyAdmin') {
@@ -82,7 +82,7 @@ const isCompanyAdminOrDepartmentHead= async (req, res, next)=>{
 
 module.exports = {
   checkToken,
-  isAdmin,
+  isCompanyAdmin,
   isAnEmployee,
   isCompanyAdminOrDepartmentHead,
 };
