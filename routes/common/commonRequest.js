@@ -3,11 +3,12 @@ const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
 const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
-const {userData}= require('./../../controllers/commonController/commonControl');
+const {userData, addTask, getTask}= require('./../../controllers/commonController/commonControl');
 const {getProfileData, updateProfile, profileName}= require('./../../controllers/commonController/profileController');
 const {getComplaintsList}= require('./../../controllers/commonController/complaintsController');
 const upload = require('./../../utilities/multer');
 const {addToCollection}=require('./../../controllers/commonController/notificationController');
+const {getChatlist, recieverProfile, getMessages} = require('./../../controllers/commonController/chatController');
 
 router.get('/userData', [
   checkToken,
@@ -45,9 +46,30 @@ router.get('/profileInfo', [
   profileName,
 ]);
 
-router.get('/profileInfo', [
+router.post('/todo', [
   checkToken,
-  profileName,
+  addTask,
 ]);
+router.get('/todo', [
+  checkToken,
+  getTask,
+]);
+
+router.get('/chatlist', [
+  checkToken,
+  getChatlist,
+]);
+
+router.get('/recieverProfile/:id', [
+  checkToken,
+  recieverProfile,
+]);
+
+router.get('/messages/:id',
+    [
+      checkToken,
+      getMessages,
+    ]);
+
 
 module.exports = router;

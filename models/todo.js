@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -15,7 +14,8 @@ const taskSchema = new mongoose.Schema({
   },
 });
 
-const userSchema = new mongoose.Schema({
+
+const TodoSchema = new mongoose.Schema({
   companyID: {
     type: String,
     required: true,
@@ -27,4 +27,4 @@ const userSchema = new mongoose.Schema({
   tasks: [taskSchema],
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Todo', TodoSchema);

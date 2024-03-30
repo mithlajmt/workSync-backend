@@ -102,7 +102,7 @@ const profileName = async (req, res) => {
         {
           $project: {
             name: '$companyName',
-            _id: 0,
+            _id: 1,
             photo: 1,
           },
         },
@@ -122,7 +122,7 @@ const profileName = async (req, res) => {
         {
           $project: {
             name: '$employeeName',
-            _id: 0,
+            _id: 1,
             photo: 1,
           },
         },

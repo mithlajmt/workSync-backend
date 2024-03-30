@@ -68,6 +68,7 @@ const employeeSchema = new mongoose.Schema({
   },
   photo: {
     type: String, // Assuming photo URL is stored as a string
+    default: 'https://i.pinimg.com/originals/6e/4c/9d/6e4c9d2edd4e96ebf5aa313f15827b15.jpg',
   },
 
   // Bio
