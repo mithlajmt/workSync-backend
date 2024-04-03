@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 const employees = require('../../models/employee');
+
 const getFullEmployeeList = async (req, res) => {
   try {
     const {companyID} = req.user;
@@ -7,6 +8,15 @@ const getFullEmployeeList = async (req, res) => {
     const employeeList = await employees.aggregate([
       {
         $match: {companyID: companyID, isActive: true},
+      },
+      {
+        $project:{
+          _id:0,
+          name: '$employeeName',
+          department: 1,
+          role: 1,
+          userID:'$employeeID'
+        }
       },
     ]);
     res.json(employeeList);
@@ -105,9 +115,74 @@ const photo = async (req, res, next)=>{
   // res.json({
   //   m:'hi u won'
   // })
-  console.log('hi')
-  next()
-}
+  console.log('hi');
+  next();
+};
+
+const getFullEmployeeData = async (req, res, next) => {
+  try {
+    const {companyID} = req.user;
+    const employeeID = req.params.id;
+
+    const employeeData = await employees.aggregate([
+      {
+        $match: {companyID, employeeID},
+      },
+      {
+        $lookup: {
+          from: 'attendances',
+          localField: 'employeeID',
+          foreignField: 'employeeID',
+          as: 'attendanceData',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          employeeName: 1,
+          department: 1,
+          role: 1,
+          hireDate: 1,
+          employeeID,
+          contactEmail: 1,
+          contactNumber: 1,
+          gender: 1,
+          photo: 1,
+          age: 1,
+          bio:1,
+          address: 1,
+          totalAttendance: {
+            $size: {
+              $filter: {
+                input: '$attendanceData',
+                as: 'attendance',
+                cond: {$in: ['$$attendance.status', ['present', 'late']]},
+              },
+            },
+          },
+          totalLeave: {
+            $size: {
+              $filter: {
+                input: '$attendanceData',
+                as: 'attendance',
+                cond: {$eq: ['$$attendance.status', 'leave']},
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'employee data loaded successfully',
+      data: employeeData,
+    });
+  } catch (error) {
+    console.error('Error retrieving employee data:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+};
 
 
 module.exports={
@@ -116,4 +191,5 @@ module.exports={
   employeeData,
   editEmployeedata,
   photo,
+  getFullEmployeeData,
 };

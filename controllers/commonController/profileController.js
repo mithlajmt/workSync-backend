@@ -60,6 +60,7 @@ const updateProfile = async (req, res, next) => {
   try {
     const {employeeID} = req.user;
     const {name, age, email, gender, phoneNumber, secondPhoneNumber, bio, address} = req.body;
+    console.log(address);
     const image = req?.file?.location; // Assuming you're uploading an image and storing its URL
 
     // Update employee data

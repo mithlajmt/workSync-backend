@@ -19,14 +19,17 @@ const getComplaintsList = async (req, res)=>{
       },
       {
         $project: {
-          '_id': 0,
+          '_id': 1,
           'title': 1,
           'attachment': 1,
+          'status': 1,
           'description': 1,
           'employeeID': 1,
           'recipient': 1,
+          'postDate': 1,
           'employeedata.employeeName': 1,
           'employeedata.department': 1,
+          'employeedata.photo': 1,
         },
       },
     ];
@@ -52,6 +55,28 @@ const getComplaintsList = async (req, res)=>{
   }
 };
 
+const mongoose = require('mongoose');
+
+const EditComplaint = async (req, res) => {
+  const id = req.params.id;
+
+  // Convert id to MongoDB ObjectId
+  const objectId = new mongoose.Types.ObjectId(id);
+
+  // Update the complaint using findByIdAndUpdate
+  try {
+    const complaint = await Complaints.findByIdAndUpdate(objectId, req.body, { new: true });
+    // Send response
+    res.status(200).json(complaint);
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 module.exports={
   getComplaintsList,
+  EditComplaint,
 };
