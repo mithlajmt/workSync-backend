@@ -41,7 +41,6 @@ const getComplaintsList = async (req, res)=>{
     }
 
     const complaints = await Complaints.aggregate(complaintsPipeline);
-    console.log(complaints);
 
     res.json({
       data: complaints,
@@ -65,13 +64,14 @@ const EditComplaint = async (req, res) => {
 
   // Update the complaint using findByIdAndUpdate
   try {
-    const complaint = await Complaints.findByIdAndUpdate(objectId, req.body, { new: true });
+    // eslint-disable-next-line max-len
+    const complaint = await Complaints.findByIdAndUpdate(objectId, req.body, {new: true});
     // Send response
     res.status(200).json(complaint);
   } catch (error) {
     // Handle errors
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({message: 'Internal server error'});
   }
 };
 

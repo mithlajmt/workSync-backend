@@ -6,6 +6,10 @@ const leaveRequestSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  companyID: {
+    type: String,
+    required: true,
+  },
 
   title: {
     type: String,

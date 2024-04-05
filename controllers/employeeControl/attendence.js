@@ -357,9 +357,9 @@ const validateLeaveDays = async (req, res, next) => {
 const registerLeaveRequest = async (req, res) => {
   try {
     // Extract necessary information from the request
-    const {employeeID} = req.user;
+    const {employeeID,companyID} = req.user;
     const {title, description, start, end} = req.body;
-    const attachment = req.file.location;
+    const attachment = req.file?.location;
 
     // Assuming getDatesBetween is a function that returns an array of dates
     const requestedDates = getDatesBetween(start, end);
@@ -384,6 +384,7 @@ const registerLeaveRequest = async (req, res) => {
       date: new Date(), // Current date
       requestedDates,
       employeeID,
+      companyID,
     });
 
     // Save the newLeaveRequest document to the database

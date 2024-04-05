@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const {checkToken, isAnEmployee}=require('../../utilities/jwtUtilis');
+const {getLeaveRequest} = require('../../controllers/organisationController/leaveRequest')
 // eslint-disable-next-line max-len
 const {
   submitAttendance,
@@ -58,6 +59,11 @@ router.post('/leaveRequest', [
   validateLeaveDays,
   registerLeaveRequest,
 ]);
+
+router.get('/leaveRequest',[
+  checkToken,
+  getLeaveRequest,
+])
 
 
 module.exports = router;

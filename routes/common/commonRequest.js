@@ -5,11 +5,11 @@ const router = express.Router();
 const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
 const {userData, addTask, getTask}= require('./../../controllers/commonController/commonControl');
 const {getProfileData, updateProfile, profileName}= require('./../../controllers/commonController/profileController');
-const {getComplaintsList,EditComplaint}= require('./../../controllers/commonController/complaintsController');
+const {getComplaintsList, EditComplaint}= require('./../../controllers/commonController/complaintsController');
 const upload = require('./../../utilities/multer');
 const {addToCollection}=require('./../../controllers/commonController/notificationController');
 const {getChatlist, recieverProfile, getMessages} = require('./../../controllers/commonController/chatController');
-const{getFullEmployeeData}=require('../../controllers/organisationController/employeesreq')
+const {getFullEmployeeData}=require('../../controllers/organisationController/employeesreq');
 
 router.get('/userData', [
   checkToken,
@@ -77,7 +77,7 @@ router.get('/messages/:id',
       getMessages,
     ]);
 
-    router.get('/employee/:id',
+router.get('/employee/:id',
     [
       checkToken,
       getFullEmployeeData,

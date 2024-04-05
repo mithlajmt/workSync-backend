@@ -11,6 +11,7 @@ const attendance = require('./routes/employees/attendence');
 const requests = require('./routes/employees/request');
 const commonReq = require('./routes/common/commonRequest');
 const notifications = require('./routes/companies/notification');
+const compCommon = require('./routes/companies/common')
 // const departmentHead = require('./routes/departmentHead/commonRequests');
 const depHead = require('./routes/departmentHead/commonRequests');
 // eslint-disable-next-line no-unused-vars
@@ -50,7 +51,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/', register);
 app.use('/attendance', attendance);
 app.use('/', requests, commonReq, department);
-app.use('/companyAdmin', employee, department, notifications);
+app.use('/companyAdmin', employee, department, notifications,compCommon);
 app.use('/departmentHead', depHead);
 
 
