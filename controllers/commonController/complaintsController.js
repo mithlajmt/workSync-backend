@@ -75,8 +75,57 @@ const EditComplaint = async (req, res) => {
   }
 };
 
+const getMyComplaints = async (req, res)=>{
+  try {
+    const {companyID, role, employeeID} = req.user;
+
+    const complaintsPipeline = [
+      {
+        $match: {companyID, employeeID},
+      },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'employeeID',
+          foreignField: 'employeeID',
+          as: 'employeedata',
+        },
+      },
+      {
+        $project: {
+          '_id': 1,
+          'title': 1,
+          'attachment': 1,
+          'status': 1,
+          'description': 1,
+          'employeeID': 1,
+          'recipient': 1,
+          'postDate': 1,
+          'employeedata.employeeName': 1,
+          'employeedata.department': 1,
+          'employeedata.photo': 1,
+        },
+      },
+    ];
+
+
+    const complaints = await Complaints.aggregate(complaintsPipeline);
+
+    res.json({
+      data: complaints,
+    });
+  } catch (error) {
+    console.error('Error fetching unreviewed complaints:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
 
 module.exports={
   getComplaintsList,
   EditComplaint,
+  getMyComplaints,
 };
