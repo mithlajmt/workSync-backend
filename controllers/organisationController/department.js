@@ -270,7 +270,7 @@ const getDepartments = async (req, res) => {
 const getDepEmployees = async (req, res, next) => {
   try {
     const depID = req.params.ID;
-    // console.log(depID);
+
 
     // Get today's date
     const today = new Date();
@@ -334,7 +334,7 @@ const getDepEmployees = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: depEmp,
-      message: 'employee data of the department fetched succesfully'
+      message: 'employee data of the department fetched succesfully',
     }); // Send the department employees data as a response
   } catch (error) {
     console.error('Error fetching department employees:', error);

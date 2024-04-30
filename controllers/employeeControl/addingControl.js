@@ -151,7 +151,7 @@ const generateEmployeeID = async (req, res, next) => {
 
 const addEmployeeToDatabase = async (req, res) => {
   try {
-    const {
+    let {
       // Personal Information
       employeeName,
       dateOfBirth,
@@ -180,10 +180,23 @@ const addEmployeeToDatabase = async (req, res) => {
     const {companyID} = req.user;
 
     const password = generatePassword(employeeName, contactEmail);
-    console.log(req.employeeID);
-    console.log('dfghjkl', employeeID);
-    console.log(password);
+
     const securityPass = await hashPassword(password);
+
+
+    const departmentHead = await Employees.aggregate(
+        [
+          {
+            $match: {department},
+          },
+        ],
+    );
+
+    if (departmentHead.length === 0) {
+      role = 'departmentHead';
+      console.log('No department heads found for the specified department.');
+    }
+
 
     const newEmployee = new Employees({
       // Personal Information
@@ -218,7 +231,7 @@ const addEmployeeToDatabase = async (req, res) => {
     await sendWelcomeEmail(contactEmail, employeeID, password);
     res.status(201).json({
       success: true,
-      message: 'User added successfully',
+      message: 'Employee added successfully',
     });
   } catch (error) {
     console.error('Error adding employee to database:', error);

@@ -12,6 +12,8 @@ const {
   getDepEmployees,
 }= require('../../controllers/organisationController/department');
 
+const {isCompanyAdminOrDepartmentHead} =require('./../../utilities/jwtUtilis');
+
 
 router.post('/department',
     [
@@ -43,7 +45,7 @@ router.get('/departments',
 router.get('/department/:ID',
     [
       validateToken,
-      checkRole,
+      isCompanyAdminOrDepartmentHead,
       getDepEmployees,
     ],
 );

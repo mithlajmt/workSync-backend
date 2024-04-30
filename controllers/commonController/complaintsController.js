@@ -77,7 +77,7 @@ const EditComplaint = async (req, res) => {
 
 const getMyComplaints = async (req, res)=>{
   try {
-    const {companyID, role, employeeID} = req.user;
+    const {companyID, employeeID} = req.user;
 
     const complaintsPipeline = [
       {

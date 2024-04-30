@@ -5,11 +5,12 @@ const router = express.Router();
 const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
 const {userData, addTask, getTask}= require('./../../controllers/commonController/commonControl');
 const {getProfileData, updateProfile, profileName}= require('./../../controllers/commonController/profileController');
-const {getComplaintsList, EditComplaint,getMyComplaints}= require('./../../controllers/commonController/complaintsController');
+const {getComplaintsList, EditComplaint, getMyComplaints}= require('./../../controllers/commonController/complaintsController');
 const upload = require('./../../utilities/multer');
 const {addToCollection}=require('./../../controllers/commonController/notificationController');
 const {getChatlist, recieverProfile, getMessages} = require('./../../controllers/commonController/chatController');
 const {getFullEmployeeData}=require('../../controllers/organisationController/employeesreq');
+const {getDepId}=require('./../../controllers/departmentHeadController/basicController');
 
 router.get('/userData', [
   checkToken,
@@ -83,10 +84,17 @@ router.get('/employee/:id',
       getFullEmployeeData,
     ]);
 
-    router.get('/complaints',
+router.get('/complaints',
     [
       checkToken,
       getMyComplaints,
+    ]);
+
+router.get('/departmentID',
+    [
+      checkToken,
+      isCompanyAdminOrDepartmentHead,
+      getDepId,
     ]);
 
 module.exports = router;

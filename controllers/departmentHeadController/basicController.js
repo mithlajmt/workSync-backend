@@ -1,15 +1,17 @@
+
 const Department = require('./../../models/department');
+const Employees = require('./../../models/employee');
 
 const getDepartment = async (req, res) => {
   try {
     // Extract department ID from the request parameters
     const departmentID = req.params.ID;
 
-    // Get today's date at the beginning of the day
+    // Get todasy's date at the beginning of the day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Use aggregation pipeline to fetch department data with additional details 
+    // Use aggregation pipeline to fetch department data with additional details
     const departmentData = await Department.aggregate([
       // Stage 1: Match department by ID
       {$match: {departmentID}},
@@ -74,6 +76,44 @@ const getDepartment = async (req, res) => {
   }
 };
 
+
+const getDepId = async (req, res) => {
+  const {companyID, employeeID} = req.user;
+  try {
+    const ID = await Employees.aggregate([
+      {
+        $match: {
+          companyID,
+          employeeID,
+        },
+      },
+      {
+        $lookup: {
+          from: 'departments',
+          localField: 'department',
+          foreignField: 'departmentName',
+          as: 'dept',
+        },
+      },
+      {
+        $project: {
+          'departmentID': {$arrayElemAt: ['$dept.departmentID', 0]},
+          '_id': 0,
+        },
+      },
+    ]);
+    console.log(ID);
+    res.json({
+      data: ID[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Internal Server Error'});
+  }
+};
+
+
 module.exports = {
   getDepartment,
+  getDepId,
 };

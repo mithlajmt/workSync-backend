@@ -28,13 +28,49 @@ const getChatlist = async (req, res, next) => {
 
       //   console.log(employees);
       // Send the list of employees as a response
-      console.log(employees);
       res.status(200).json({success: true, data: employees});
-    } else {
-      // Handle other roles if needed
-      // Sending a response is recommended even for other roles
-      res.status(403).json({success: false, message: 'Access forbidden'});
+    } else if (role==='departmentHead'){
+      const companyAdmin = await Company.aggregate([
+        {
+          $match: { companyID },
+        },
+        {
+          $project: {
+            _id: 1,
+            userName: '$companyName',
+            photo: 1,
+            userID: '$companyID',
+          },
+        },
+      ]);
+      
+      const recipients = await Employees.aggregate([
+        {
+          $match: { companyID, isActive: true },
+        },
+        {
+          $project: {
+            _id: 1,
+            userName: '$employeeName',
+            department: 1,
+            photo: 1,
+            userID: '$employeeID',
+          },
+        },
+      ]);
+      
+      // Combine companyAdmin and recipients into one array
+      const combinedData = [...companyAdmin, ...recipients];
+      
+      res.status(200).json({success: true, data: combinedData});
     }
+    
+
+    // else {
+    // Handle other roles if needed
+    // Sending a response is recommended even for other roles
+    // res.status(403).json({success: false, message: 'Access forbidden'});
+    // }
   } catch (error) {
     console.error('Error fetching chat list:', error);
     res.status(500).json({success: false, error: 'Internal Server Error'});
