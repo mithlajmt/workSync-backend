@@ -78,12 +78,13 @@ const upDateLeaveRequest = async (req, res) => {
     const id = req.params.id;
     const mID = new mongoose.Types.ObjectId(id); // Convert id to ObjectId
     const {status} = req.body;
+    console.log(mID, status);
 
     // eslint-disable-next-line max-len
     const updatedLeave = await Leaves.findByIdAndUpdate(mID, {reviewStatus: status}, {new: true});
 
     if (!updatedLeave) {
-      return res.status(404).json({
+      return res.status(200).json({
         message: 'Leave request not found'});
     }
 

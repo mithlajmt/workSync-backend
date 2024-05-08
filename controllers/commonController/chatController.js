@@ -26,13 +26,11 @@ const getChatlist = async (req, res, next) => {
         },
       ]);
 
-      //   console.log(employees);
-      // Send the list of employees as a response
       res.status(200).json({success: true, data: employees});
-    } else if (role==='departmentHead'){
+    } else if (role === 'departmentHead') {
       const companyAdmin = await Company.aggregate([
         {
-          $match: { companyID },
+          $match: {companyID},
         },
         {
           $project: {
@@ -43,10 +41,10 @@ const getChatlist = async (req, res, next) => {
           },
         },
       ]);
-      
+
       const recipients = await Employees.aggregate([
         {
-          $match: { companyID, isActive: true },
+          $match: {companyID, isActive: true},
         },
         {
           $project: {
@@ -58,24 +56,58 @@ const getChatlist = async (req, res, next) => {
           },
         },
       ]);
-      
-      // Combine companyAdmin and recipients into one array
-      const combinedData = [...companyAdmin, ...recipients];
-      
-      res.status(200).json({success: true, data: combinedData});
-    }
-    
 
-    // else {
-    // Handle other roles if needed
-    // Sending a response is recommended even for other roles
-    // res.status(403).json({success: false, message: 'Access forbidden'});
-    // }
+      const combinedData = [...companyAdmin, ...recipients];
+
+      res.status(200).json({success: true, data: combinedData});
+    } else if (role === 'employee') {
+      const departmentHead = await Employees.aggregate([
+        {
+          $match: {
+            employeeID, // Match the user by their employeeID
+          },
+        },
+        {
+          $lookup: {
+            from: 'employees',
+            localField: 'department',
+            foreignField: 'department',
+            as: 'departmentData',
+          },
+        },
+        {
+          $unwind: '$departmentData' // Unwind the departmentData array
+        },
+        {
+          $match: {
+            'departmentData.role': 'departmentHead',
+            'departmentData.isActive': true,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            userName: '$departmentData.employeeName',
+            role: '$departmentData.role',
+            photo: '$departmentData.photo',
+            userID: '$departmentData.employeeID',
+          },
+        },
+      ]);
+      
+      console.log(departmentHead);
+      
+      res.status(200).json({success: true, data: departmentHead});
+      
+    } else {
+      res.status(403).json({success: false, message: 'Access forbidden'});
+    }
   } catch (error) {
     console.error('Error fetching chat list:', error);
     res.status(500).json({success: false, error: 'Internal Server Error'});
   }
 };
+
 
 const recieverProfile = async (req, res, next) => {
   const userID = req.params.id;

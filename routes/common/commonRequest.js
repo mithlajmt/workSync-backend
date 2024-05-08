@@ -3,7 +3,7 @@ const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
 const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
-const {userData, addTask, getTask}= require('./../../controllers/commonController/commonControl');
+const {userData, addTask, getTask, editTask, deleteTask}= require('./../../controllers/commonController/commonControl');
 const {getProfileData, updateProfile, profileName}= require('./../../controllers/commonController/profileController');
 const {getComplaintsList, EditComplaint, getMyComplaints}= require('./../../controllers/commonController/complaintsController');
 const upload = require('./../../utilities/multer');
@@ -45,7 +45,6 @@ router.patch('/profile', [
   checkToken,
   upload.single('image'),
   updateProfile,
-
 ]);
 
 router.get('/profileInfo', [
@@ -60,6 +59,16 @@ router.post('/todo', [
 router.get('/todo', [
   checkToken,
   getTask,
+]);
+
+router.patch('/todo', [
+  checkToken,
+  editTask,
+]);
+
+router.delete('/todo/:id', [
+  checkToken,
+  deleteTask,
 ]);
 
 router.get('/chatlist', [

@@ -18,7 +18,7 @@ const depHead = require('./routes/departmentHead/commonRequests');
 const cron = require('./utilities/autoCheckOut-nodechron');
 
 
-dotenv.config(); // Invoke dotenv to load environment variables
+dotenv.config(); // Invoke dotenv to load environment variables for test
 
 const app = express(); // Create an instance of the Express application
 const port = process.env.PORT || 3000; // Set the port for the server to listen

@@ -193,8 +193,101 @@ const getTask = async (req, res, next) => {
 };
 
 
+const editTask = async (req, res) => {
+  try {
+    const userID = req.user.employeeID || req.user.companyID;
+    const {id, status} = req.body;
+
+    const todoList = await Todo.findOne({userID});
+
+    if (!todoList) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo list not found',
+      });
+    }
+
+    // eslint-disable-next-line max-len
+    const taskToUpdate = todoList.tasks.find((task) => task._id.toString() === id);
+
+    if (!taskToUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found',
+      });
+    }
+
+    taskToUpdate.status = status;
+
+    await todoList.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Task status updated successfully',
+      updatedTask: taskToUpdate,
+    });
+  } catch (error) {
+    console.error('Error editing task:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+
+const deleteTask = async (req, res) => {
+  try {
+    const userID = req.user.employeeID || req.user.companyID;
+    const taskID = req.params.id;
+
+    // Find the todo list in the database based on userID
+    const todoList = await Todo.findOne({userID});
+
+    if (!todoList) {
+      return res.status(404).json({
+        success: false,
+        message: 'Todo list not found',
+      });
+    }
+
+
+    // Find the index of the task in the tasks array
+    // eslint-disable-next-line max-len
+    const taskIndex = todoList.tasks.findIndex((task) => task._id.toString() === taskID);
+
+
+    if (taskIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found',
+      });
+    }
+
+    // Remove the task from the tasks array
+    todoList.tasks.splice(taskIndex, 1);
+
+    // Save the updated todo list
+    await todoList.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Task deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+
 module.exports = {
   userData,
   addTask,
   getTask,
+  editTask,
+  deleteTask,
 };
