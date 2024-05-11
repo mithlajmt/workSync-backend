@@ -60,7 +60,6 @@ const updateProfile = async (req, res, next) => {
   try {
     const {employeeID} = req.user;
     const {name, age, email, gender, phoneNumber, secondPhoneNumber, bio, address} = req.body;
-    console.log(address);
     const image = req?.file?.location; // Assuming you're uploading an image and storing its URL
 
     // Update employee data
@@ -68,15 +67,15 @@ const updateProfile = async (req, res, next) => {
         {employeeID},
         {
           $set: {
-            employeeName: name,
+            name,
             age,
-            contactEmail: email,
+            email,
             gender,
-            contactNumber: phoneNumber,
+            phoneNumber,
             secondPhoneNumber,
             address,
-            bio: bio,
-            photo: image,
+            bio,
+            image,
           },
         },
         {new: true}, // To return the updated document
@@ -88,6 +87,7 @@ const updateProfile = async (req, res, next) => {
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 };
+
 
 // Function to fetch profile name based on user role
 const profileName = async (req, res) => {

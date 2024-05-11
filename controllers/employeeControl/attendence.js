@@ -357,8 +357,8 @@ const validateLeaveDays = async (req, res, next) => {
 const registerLeaveRequest = async (req, res) => {
   try {
     // Extract necessary information from the request
-    const {employeeID,companyID} = req.user;
-    const {title, description, start, end} = req.body;
+    const { employeeID, companyID } = req.user;
+    const { title, description, start, end } = req.body;
     const attachment = req.file?.location;
 
     // Assuming getDatesBetween is a function that returns an array of dates
@@ -375,7 +375,6 @@ const registerLeaveRequest = async (req, res) => {
     // Continue with the rest of your logic if there are requestedDates
     // ...
 
-
     // Create a new LeaveRequest document
     const newLeaveRequest = new LeaveRequest({
       title,
@@ -390,10 +389,39 @@ const registerLeaveRequest = async (req, res) => {
     // Save the newLeaveRequest document to the database
     await newLeaveRequest.save();
 
+    // Perform aggregation on the LeaveRequest model
+    const newData = await LeaveRequest.aggregate([
+      {
+        $match: {
+          _id: newLeaveRequest._id, // Match the newly created leave request
+        },
+      },
+      {
+        $lookup: {
+          from: 'employees',
+          localField: 'employeeID',
+          foreignField: 'employeeID',
+          as: 'employeeData',
+        },
+      },
+      {
+        $project: {
+          'employeeID': 1,
+          'title': 1,
+          'description': 1,
+          'reviewStatus': 1,
+          'requestedDates': 1,
+          'attachment': 1,
+          'userName': { $arrayElemAt: ['$employeeData.employeeName', 0] }, // Access employeeName directly
+          'photo': { $arrayElemAt: ['$employeeData.photo', 0] }, // Access photo directly
+        },
+      },
+    ]);
+
     // Respond with a success message and the created leave request data
     res.status(201).json({
       success: true,
-      data: '',
+      data: newData[0], // Assuming newData is an array with one element
       message: 'Your leave request has been successfully submitted for review.',
     });
   } catch (error) {
@@ -405,6 +433,7 @@ const registerLeaveRequest = async (req, res) => {
     });
   }
 };
+
 
 
 // Export the controllers and middlewares

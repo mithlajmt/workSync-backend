@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const profileSchema = new mongoose.Schema({
   employeeID: {
-    type: String,
     required: true,
+    type: String,
   },
   companyID: {
     required: true,
@@ -18,8 +18,8 @@ const profileSchema = new mongoose.Schema({
     default: 'https://i.pinimg.com/originals/6e/4c/9d/6e4c9d2edd4e96ebf5aa313f15827b15.jpg',
   },
   address: {
-    type: String,
     required: true,
+    type: String,
   },
   secondPhoneNumber: {
     type: String,
