@@ -282,8 +282,6 @@ const deleteTask = async (req, res) => {
     });
   }
 };
-
-
 module.exports = {
   userData,
   addTask,
