@@ -41,7 +41,6 @@ router.post('/verify-otp', [
 
 router.post('/login', [
   checkData,
-
 ]);
 
 // Export the router for use in the main application

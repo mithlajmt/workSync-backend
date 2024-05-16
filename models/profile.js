@@ -17,14 +17,6 @@ const profileSchema = new mongoose.Schema({
     type: String,
     default: 'https://i.pinimg.com/originals/6e/4c/9d/6e4c9d2edd4e96ebf5aa313f15827b15.jpg',
   },
-  address: {
-    required: true,
-    type: String,
-  },
-  secondPhoneNumber: {
-    type: String,
-    default: '',
-  },
 
   bio: {
     type: String,

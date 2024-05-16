@@ -1,7 +1,8 @@
+/* eslint-disable new-cap */
 /* eslint-disable max-len */
 const express = require('express');
 const router = express.Router();
-const {checkToken, isCompanyAdmin, isCompanyAdminOrDepartmentHead}=require('./../../utilities/jwtUtilis');
+const {checkToken, isCompanyAdmin}=require('./../../utilities/jwtUtilis');
 
 const {addToCollection, getNotificationListCompany}=require('./../../controllers/commonController/notificationController');
 const upload = require('./../../utilities/multer');

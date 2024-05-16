@@ -1,5 +1,6 @@
 // Import required modules and functions
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 
 const {
@@ -12,14 +13,9 @@ const {
 } = require('./../../controllers/departmentHeadController/basicController');
 
 
-// Define a route for getting department by ID
 router.get('/department/:ID', [
-  // Middleware for checking token
   checkToken,
-
-  // Middleware for checking if the user is an admin or department head
   isCompanyAdminOrDepartmentHead,
-
   getDepartment,
 ]);
 

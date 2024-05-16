@@ -172,6 +172,7 @@ const submitAttendance = async (req, res) => {
         isLate,
         status,
         department,
+        Image: req.file.location,
       });
 
       // Save the attendance record

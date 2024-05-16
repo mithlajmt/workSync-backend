@@ -71,19 +71,24 @@ const employeeSchema = new mongoose.Schema({
     default: 'https://i.pinimg.com/originals/6e/4c/9d/6e4c9d2edd4e96ebf5aa313f15827b15.jpg',
   },
 
+  address: {
+    type: String,
+  },
+  secondPhoneNumber: {
+    type: String,
+    default: '',
+  },
+
   // Bio
   bio: {
     type: String,
   },
-  // address: {
-    // type: String,
-  // },
-  // Status
   isActive: {
     type: Boolean,
     required: true,
     default: true,
   },
+
 });
 
 // Compound index on email and CompanyID

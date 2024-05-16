@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 const cron = require('node-cron');
 const Attendance = require('./../models/attendence');
+const Employees = require('./../models/employee');
 
 const checkOutEmployees = async () => {
   try {
@@ -25,10 +26,49 @@ const checkOutEmployees = async () => {
 };
 
 
-// Schedule the cron job to run every day at 3 AM
+const markLeave = async () => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const activeEmployees = await Employees.find({isActive: true});
+
+    // Iterate over active employees
+    for (const employee of activeEmployees) {
+      const existingAttendance = await Attendance.findOne({
+        employeeID: employee.employeeID,
+        date: today,
+      });
+
+      if (!existingAttendance) {
+        const attendance = new Attendance({
+          companyID: employee.companyID,
+          employeeID: employee.employeeID,
+          date: today,
+          status: 'leave',
+          department: employee.department,
+        });
+
+        await attendance.save();
+        // console.log(`Marked leave for employee ${employee.employeeID}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error marking leave:', error);
+  }
+};
+
+
 cron.schedule('0 23 * * 1-6', async () => {
   await checkOutEmployees();
 });
+
+
+// Schedule the cron job to run at 11:30 AM every day except Sunday
+cron.schedule('30 11 * * 1-6', async () => {
+  await markLeave();
+});
+
 
 // cron.schedule('* * * * *', () => {
 //     console.log('running a task every minute');

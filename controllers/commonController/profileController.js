@@ -60,7 +60,7 @@ const updateProfile = async (req, res, next) => {
   try {
     const {employeeID} = req.user;
     const {name, age, email, gender, phoneNumber, secondPhoneNumber, bio, address} = req.body;
-    const image = req?.file?.location; // Assuming you're uploading an image and storing its URL
+    const photo = req?.file?.location;
 
     // Update employee data
     const updatedEmployee = await Employee.findOneAndUpdate(
@@ -75,7 +75,7 @@ const updateProfile = async (req, res, next) => {
             secondPhoneNumber,
             address,
             bio,
-            image,
+            photo,
           },
         },
         {new: true}, // To return the updated document

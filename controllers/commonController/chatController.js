@@ -7,13 +7,14 @@ const Messages = require('../../models/messages');
 
 
 const getChatlist = async (req, res, next) => {
+  console.log(req.user);
   const {companyID, employeeID, role} = req.user;
 
   try {
     if (role === 'companyAdmin') {
       const employees = await Employees.aggregate([
         {
-          $match: {companyID, role: 'departmentHead'},
+          $match: {companyID, role: 'departmentHead', isActive: true},
         },
         {
           $project: {
@@ -28,6 +29,9 @@ const getChatlist = async (req, res, next) => {
 
       res.status(200).json({success: true, data: employees});
     } else if (role === 'departmentHead') {
+      const employee = await Employees.find({employeeID});
+      depname = employee[0].department;
+
       const companyAdmin = await Company.aggregate([
         {
           $match: {companyID},
@@ -44,7 +48,7 @@ const getChatlist = async (req, res, next) => {
 
       const recipients = await Employees.aggregate([
         {
-          $match: {companyID, isActive: true},
+          $match: {companyID, department: depname, isActive: true},
         },
         {
           $project: {
@@ -76,7 +80,7 @@ const getChatlist = async (req, res, next) => {
           },
         },
         {
-          $unwind: '$departmentData' // Unwind the departmentData array
+          $unwind: '$departmentData',
         },
         {
           $match: {
@@ -94,11 +98,8 @@ const getChatlist = async (req, res, next) => {
           },
         },
       ]);
-      
-      console.log(departmentHead);
-      
+
       res.status(200).json({success: true, data: departmentHead});
-      
     } else {
       res.status(403).json({success: false, message: 'Access forbidden'});
     }
@@ -190,7 +191,6 @@ const getMessages = async (req, res) => {
       },
     ]);
 
-    console.log('Messages:', messages);
 
     // Send success response with data
     res.status(200).json({

@@ -156,6 +156,7 @@ const addEmployeeToDatabase = async (req, res) => {
       employeeName,
       dateOfBirth,
       gender,
+      salary,
 
       // Company Information
 
@@ -214,6 +215,7 @@ const addEmployeeToDatabase = async (req, res) => {
       // Hire Date and Department
       hireDate,
       department,
+      salary,
 
       // Role/Position
       position,
@@ -232,6 +234,7 @@ const addEmployeeToDatabase = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Employee added successfully',
+      note: 'userID and password shared to employee email',
     });
   } catch (error) {
     console.error('Error adding employee to database:', error);

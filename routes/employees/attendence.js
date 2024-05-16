@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const {checkToken, isAnEmployee}=require('../../utilities/jwtUtilis');
-const {getLeaveRequest} = require('../../controllers/organisationController/leaveRequest')
 // eslint-disable-next-line max-len
+const {getLeaveRequest} = require('../../controllers/organisationController/leaveRequest');
 const {
   submitAttendance,
   validateCheckIn,
@@ -15,7 +15,7 @@ const {
   registerCheckOut,
   attendanceType,
   validateLeaveDays,
-  registerLeaveRequest
+  registerLeaveRequest,
 } = require('../../controllers/employeeControl/attendence');
 
 const upload = require('./../../utilities/multer');
@@ -24,19 +24,19 @@ const upload = require('./../../utilities/multer');
 router.post('/checkIn', [
   checkToken,
   isAnEmployee,
-  // checkWorkingDay,
+  checkWorkingDay,
   validateCheckIn,
   checkStatus,
-  // upload.single('photo'),
+  upload.single('photo'),
   submitAttendance,
 ]);
 
 router.post('/checkOut', [
   checkToken,
   isAnEmployee,
-  // checkWorkingDay,
+  checkWorkingDay,
   checkInExists,
-  // upload.single('photo'),
+  upload.single('photo'),
   registerCheckOut,
 ]);
 
@@ -60,10 +60,10 @@ router.post('/leaveRequest', [
   registerLeaveRequest,
 ]);
 
-router.get('/leaveRequest',[
+router.get('/leaveRequest', [
   checkToken,
   getLeaveRequest,
-])
+]);
 
 
 module.exports = router;

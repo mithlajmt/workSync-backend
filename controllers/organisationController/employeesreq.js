@@ -10,13 +10,13 @@ const getFullEmployeeList = async (req, res) => {
         $match: {companyID: companyID, isActive: true},
       },
       {
-        $project:{
-          _id:0,
+        $project: {
+          _id: 0,
           name: '$employeeName',
           department: 1,
           role: 1,
-          userID:'$employeeID'
-        }
+          userID: '$employeeID',
+        },
       },
     ]);
     res.json(employeeList);
@@ -63,10 +63,7 @@ const employeeData = async (req, res, next) => {
   try {
     const {companyID} = req.user;
     const employeeID = req.params.employeeID;
-    // console.log('hi', employeeID);
 
-    // Assuming `employees` is a model or database collection
-    // and you're using async/await for database operations
     const employee = await employees.findOne({
       companyID,
       employeeID,
@@ -149,7 +146,8 @@ const getFullEmployeeData = async (req, res, next) => {
           gender: 1,
           photo: 1,
           age: 1,
-          bio:1,
+          bio: 1,
+          salary: 1,
           address: 1,
           totalAttendance: {
             $size: {
