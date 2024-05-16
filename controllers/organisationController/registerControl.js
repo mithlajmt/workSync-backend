@@ -19,14 +19,14 @@ const client = twilio(accountSid, authId);
 const otpGenerate = async function(phone) {
   console.log('OTP function invoked');
 
-  // try {
-  //   // Create a verification request using Twilio's Verify API
-  //   await client.verify.v2.services(serviceSid)
-  //       .verifications.create({to: `${countryCode}${phone}`, channel: 'sms'});
-  // } catch (err) {
-  //   console.error('Error generating OTP:', err.message);
-  //   throw err;
-  // }
+  try {
+    // Create a verification request using Twilio's Verify API
+    await client.verify.v2.services(serviceSid)
+        .verifications.create({to: `${countryCode}${phone}`, channel: 'sms'});
+  } catch (err) {
+    console.error('Error generating OTP:', err.message);
+    throw err;
+  }
 };
 
 // Function to handle OTP generation request
@@ -56,11 +56,9 @@ const otpVerify = async (req, res, next) => {
     const formattedContactNumber = String(contactNumber);
 
     // Verification check using Twilio's Verify API
-    // const verificationCheck = await client.verify.v2.services(serviceSid)
-    // .verificationChecks.create({to: `${countryCode}${formattedContactNumber}`, code: otp});
-    const verificationCheck={
-      status: 'approved',
-    };
+    const verificationCheck = await client.verify.v2.services(serviceSid)
+        .verificationChecks.create({to: `${countryCode}${formattedContactNumber}`, code: otp});
+
 
     console.log(verificationCheck.status);
     console.log(verificationCheck);

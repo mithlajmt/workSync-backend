@@ -29,7 +29,7 @@ const checkData = async (req, res) => {
           };
 
           const token = jwt.sign(payload, secretKey, {
-            expiresIn: '2hr',
+            expiresIn: '8hr',
           });
           console.log(token);
 
@@ -60,8 +60,7 @@ const checkData = async (req, res) => {
       if (user) {
         const {companyID, contactEmail, role, password: hashedPassword, _id, employeeID} = user;
 
-        // const authorised = await bcrypt.compare(password, hashedPassword);
-         const authorised=true
+        const authorised = await bcrypt.compare(password, hashedPassword);
 
         if (authorised) {
           const secretKey = process.env.JWT_SECRET;
@@ -75,7 +74,7 @@ const checkData = async (req, res) => {
           };
 
           const token = jwt.sign(payload, secretKey, {
-            expiresIn: '3h',
+            expiresIn: '8h',
           });
 
           return res.status(200).json({

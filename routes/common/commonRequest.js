@@ -11,6 +11,7 @@ const {addToCollection}=require('./../../controllers/commonController/notificati
 const {getChatlist, recieverProfile, getMessages} = require('./../../controllers/commonController/chatController');
 const {getFullEmployeeData}=require('../../controllers/organisationController/employeesreq');
 const {getDepId}=require('./../../controllers/departmentHeadController/basicController');
+const {calendarData} = require('./../../controllers/commonController/notificationController');
 
 router.get('/userData', [
   checkToken,
@@ -97,6 +98,12 @@ router.get('/complaints',
     [
       checkToken,
       getMyComplaints,
+    ]);
+
+router.get('/events',
+    [
+      checkToken,
+      calendarData,
     ]);
 
 router.get('/departmentID',

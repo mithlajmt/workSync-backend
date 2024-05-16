@@ -3,7 +3,9 @@ const express = require('express');
 const router = express.Router();
 const {checkToken, isAnEmployee}=require('./../../utilities/jwtUtilis');
 // eslint-disable-next-line max-len
-const {validateFields,registerComplaint}=require('../../controllers/employeeControl/requestControl');
+const {validateFields, registerComplaint}=require('../../controllers/employeeControl/requestControl');
+// eslint-disable-next-line max-len
+const {getNotificationList}= require('../../controllers/commonController/notificationController');
 const upload = require('./../../utilities/multer');
 
 
@@ -13,5 +15,11 @@ router.post('/complaints', [
   upload.single('attachment'),
   validateFields,
   registerComplaint,
+]);
+
+router.get('/notification', [
+  checkToken,
+  isAnEmployee,
+  getNotificationList,
 ]);
 module.exports = router;

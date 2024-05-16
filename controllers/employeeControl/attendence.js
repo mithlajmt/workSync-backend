@@ -358,8 +358,8 @@ const validateLeaveDays = async (req, res, next) => {
 const registerLeaveRequest = async (req, res) => {
   try {
     // Extract necessary information from the request
-    const { employeeID, companyID } = req.user;
-    const { title, description, start, end } = req.body;
+    const {employeeID, companyID} = req.user;
+    const {title, description, start, end} = req.body;
     const attachment = req.file?.location;
 
     // Assuming getDatesBetween is a function that returns an array of dates
@@ -413,8 +413,8 @@ const registerLeaveRequest = async (req, res) => {
           'reviewStatus': 1,
           'requestedDates': 1,
           'attachment': 1,
-          'userName': { $arrayElemAt: ['$employeeData.employeeName', 0] }, // Access employeeName directly
-          'photo': { $arrayElemAt: ['$employeeData.photo', 0] }, // Access photo directly
+          'userName': {$arrayElemAt: ['$employeeData.employeeName', 0]}, // Access employeeName directly
+          'photo': {$arrayElemAt: ['$employeeData.photo', 0]}, // Access photo directly
         },
       },
     ]);
@@ -434,7 +434,6 @@ const registerLeaveRequest = async (req, res) => {
     });
   }
 };
-
 
 
 // Export the controllers and middlewares

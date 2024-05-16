@@ -22,7 +22,6 @@
  * });
  */
 function checkRequiredFields(req, res, requiredFields) {
-  
   const missingFields = [];
   requiredFields.forEach((field) => {
     if (!(field in req.body)) {
