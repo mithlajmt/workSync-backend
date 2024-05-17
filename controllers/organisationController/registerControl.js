@@ -40,8 +40,8 @@ const getOtp = async (req, res, next) => {
   // Generate OTP and handle the result
   try {
     await otpGenerate(formattedContactNumber);
-    // next();
-    res.json('OTP generated successfully');
+    next();
+    // res.json('OTP generated successfully');
   } catch (err) {
     console.error('Error in OTP generationgggg:', err.message);
     res.status(500).json('Error generating OTP');
