@@ -43,7 +43,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.use(cors({
-  origin: 'https://worksync.illuminatespark.com', // Replace with your frontend URL
+  origin: 'https://worksync.illuminatesparks.com', // Replace with your frontend URL
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, // Allow cookies to be sent
   optionsSuccessStatus: 204
