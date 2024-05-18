@@ -14,7 +14,7 @@ const addToCollection = async (req, res) => {
       eventType,
     } = req.body;
 
-    const recieps = recipients.split(',');
+    const recieps = recipients.split(',').map((recipient) => recipient.trim());
     const {companyID} = req.user;
     console.log(req?.file?.location);
     const location = req?.file?.location;
@@ -90,14 +90,20 @@ const getNotificationListCompany = async (req, res) => {
     res.status(500).json({error: 'Internal server error'});
   }
 };
-
-const getNotificationList = async (req, res)=>{
+const getNotificationList = async (req, res) => {
+  console.log('ji');
   try {
     const {companyID, employeeID, role} = req.user;
     const employee = await Employees.findOne({employeeID, isActive: true});
+
+    if (!employee) {
+      return res.status(404).json({error: 'Employee not found'});
+    }
+
     const department = employee.department;
     const currentDate = new Date();
 
+    // Aggregation pipeline for upcoming notifications
     const upcomingpipeLine = [
       {
         $match: {
@@ -108,6 +114,7 @@ const getNotificationList = async (req, res)=>{
       },
     ];
 
+    // Aggregation pipeline for previous or all notifications
     const previouspipeline = [
       {
         $match: {
@@ -118,15 +125,25 @@ const getNotificationList = async (req, res)=>{
       },
     ];
 
-    if (role ==='employee') {
+    // Adjust the pipelines for employee role
+    if (role === 'employee') {
       upcomingpipeLine.push({$match: {target: 'ALL'}});
-      previouspipeLine.push({$match: {target: 'ALL'}});
+      previouspipeline.push({$match: {target: 'ALL'}});
     }
 
-    const upcomingNotifications = await Notification.aggregate(upcomingpipeLine);
+    // Log the aggregation pipelines for debugging
+    console.log('Upcoming Pipeline:', JSON.stringify(upcomingpipeLine, null, 2));
+    console.log('Previous Pipeline:', JSON.stringify(previouspipeline, null, 2));
 
+    // Execute the aggregation pipelines
+    const upcomingNotifications = await Notification.aggregate(upcomingpipeLine);
     const previousOrAllNotifications = await Notification.aggregate(previouspipeline);
 
+    // Log the results for debugging
+    console.log('Upcoming Notifications:', upcomingNotifications);
+    console.log('Previous or All Notifications:', previousOrAllNotifications);
+
+    // Send the response
     res.status(200).json({
       upcomingNotifications: upcomingNotifications,
       previousOrAllNotifications: previousOrAllNotifications,
@@ -136,7 +153,6 @@ const getNotificationList = async (req, res)=>{
     res.status(500).json({error: 'Internal server error'});
   }
 };
-
 
 const getDatesBetween = (startDate, endDate) => {
   console.log(startDate);
@@ -156,7 +172,15 @@ const getDatesBetween = (startDate, endDate) => {
 const calendarData = async (req, res) => {
   try {
     const {companyID, employeeID, role} = req.user;
+
+    //
+    // Fetch the employee record
     const employee = await Employees.findOne({employeeID, isActive: true});
+    if (!employee) {
+      return res.status(404).json({error: 'Employee not found'});
+    }
+
+
     const department = employee.department;
 
     const aggregationPipe = [
@@ -168,9 +192,11 @@ const calendarData = async (req, res) => {
       },
     ];
 
-    if (role === 'employee' ) {
+    // Adjust pipeline for employee role
+    if (role === 'employee') {
       aggregationPipe.push({$match: {target: 'ALL'}});
     }
+
 
     const notifications = await Notification.aggregate(aggregationPipe);
 
@@ -204,6 +230,8 @@ const calendarData = async (req, res) => {
         });
       });
     });
+
+
     res.status(200).json({
       data: dataForCalendar,
     });

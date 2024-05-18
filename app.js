@@ -14,6 +14,7 @@ const notifications = require('./routes/companies/notification');
 const compCommon = require('./routes/companies/common');
 // const departmentHead = require('./routes/departmentHead/commonRequests');
 const depHead = require('./routes/departmentHead/commonRequests');
+const emp = require('./routes/employees/request');
 // eslint-disable-next-line no-unused-vars
 const cron = require('./utilities/autoCheckOut-nodechron');
 
@@ -42,16 +43,17 @@ db.once('open', () => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use(cors({
-  origin: 'https://worksync.illuminatespark.com', // Replace with your frontend URL
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, // Allow cookies to be sent
-  optionsSuccessStatus: 204
-}));
+// app.use(cors({
+//   origin: 'https://worksync.illuminatespark.com', // Replace with your frontend URL
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   credentials: true, // Allow cookies to be sent
+//   optionsSuccessStatus: 204,
+// }));
 
 
 app.use('/', register);
 app.use('/attendance', attendance);
+app.use('/employee', requests);
 app.use('/', requests, commonReq, department);
 app.use('/companyAdmin', employee, department, notifications, compCommon);
 app.use('/departmentHead', depHead);

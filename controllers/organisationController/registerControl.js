@@ -5,7 +5,7 @@ const twilio = require('twilio');
 const bcrypt = require('bcrypt');
 const Company = require('../../models/company');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -227,7 +227,6 @@ const generateCompanyID = async (companyName, contactNumber) => {
 };
 
 
-// Function to hash the password
 const hashPassword = async (password) => {
   const saltRound = 10;
   const salt = await bcrypt.genSalt(saltRound);
@@ -235,7 +234,6 @@ const hashPassword = async (password) => {
   return hash;
 };
 
-// Function to handle company registration after OTP verification
 const verifyRegistration = async (req, res) => {
   const {
     companyName,
@@ -283,7 +281,7 @@ const verifyRegistration = async (req, res) => {
 
 
     const token = jwt.sign(payload, secretKey, {
-      expiresIn: '1hr', // Specify the expiration time in milliseconds
+      expiresIn: '1hr',
     });
 
 
@@ -303,7 +301,6 @@ const verifyRegistration = async (req, res) => {
 };
 
 
-// Export the functions for external use
 module.exports = {
   getOtp,
   otpVerify,
