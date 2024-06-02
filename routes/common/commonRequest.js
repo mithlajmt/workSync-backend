@@ -12,6 +12,8 @@ const {getChatlist, recieverProfile, getMessages} = require('./../../controllers
 const {getFullEmployeeData}=require('../../controllers/organisationController/employeesreq');
 const {getDepId}=require('./../../controllers/departmentHeadController/basicController');
 const {calendarData} = require('./../../controllers/commonController/notificationController');
+const saveContact = require('./../../controllers/commonController/portfolioController');
+const {getEmployeeAttendance}=require('./../../controllers/employeeControl/attendence')
 
 router.get('/userData', [
   checkToken,
@@ -112,5 +114,16 @@ router.get('/departmentID',
       isCompanyAdminOrDepartmentHead,
       getDepId,
     ]);
+
+router.post('/submit', [
+  saveContact,
+]);
+
+router.get('/attendance/:id', [
+  checkToken,
+  isCompanyAdminOrDepartmentHead,
+  getEmployeeAttendance,
+
+]);
 
 module.exports = router;

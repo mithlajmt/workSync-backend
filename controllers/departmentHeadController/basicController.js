@@ -7,7 +7,7 @@ const getDepartment = async (req, res) => {
     // Extract department ID from the request parameters
     const departmentID = req.params.ID;
 
-    // Get todasy's date at the beginning of the day
+    // Get today's date at the beginning of the day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -16,6 +16,7 @@ const getDepartment = async (req, res) => {
       // Stage 1: Match department by ID
       {$match: {departmentID}},
 
+      // Stage 2: Left outer join with employees collection
       {
         $lookup: {
           from: 'employees',
@@ -31,23 +32,36 @@ const getDepartment = async (req, res) => {
           from: 'attendances',
           let: {departmentName: '$departmentName'},
           pipeline: [
-            // Sub-pipeline: Match attendance records today's date of department
+            // Sub-pipeline: Match attendance records for today's date of department
             {
               $match: {
                 $expr: {
                   $and: [
                     {$eq: ['$department', '$$departmentName']},
-                    {$gte: ['$date', today]}, // Filter for today's date orlater
+                    {$gte: ['$date', today]}, // Filter for today's date or later
                   ],
                 },
               },
             },
+            // Stage 4: Facet to separate present and leave statuses
+            {
+              $facet: {
+                present: [
+                  {$match: {status: 'present'}},
+                  {$count: 'count'},
+                ],
+                leave: [
+                  {$match: {status: 'leave'}},
+                  {$count: 'count'},
+                ],
+              },
+            },
           ],
-          as: 'attendance',
+          as: 'attendanceStats',
         },
       },
 
-      // Stage 4: Project department details and counts
+      // Stage 5: Project department details and counts
       {
         $project: {
           _id: 0,
@@ -56,7 +70,12 @@ const getDepartment = async (req, res) => {
           description: 1,
           budget: 1,
           totalEmployees: {$size: '$employees'},
-          attendancesToday: {$size: '$attendance'},
+          attendancesToday: {
+            $ifNull: [{$arrayElemAt: ['$attendanceStats.present.count', 0]}, 0],
+          },
+          leaveToday: {
+            $ifNull: [{$arrayElemAt: ['$attendanceStats.leave.count', 0]}, 0],
+          },
         },
       },
     ]);

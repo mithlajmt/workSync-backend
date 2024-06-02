@@ -33,7 +33,6 @@ const db = mongoose.connection; // Get the MongoDB connection instance
 
 // MongoDB connection event handlers
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// Handle connection errors
 db.once('open', () => {
   console.log('Connected to MongoDB');
   // Log a message once the connection is successfully established

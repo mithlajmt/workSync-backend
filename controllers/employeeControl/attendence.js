@@ -6,6 +6,7 @@ const {DateTime} = require('luxon');
 const {getDatesBetween}=require('./../../utilities/dateUtility');
 const LeaveRequest = require('./../../models/leaveRequest');
 
+
 // Middleware to check if it's a working day (not Sunday)
 const checkWorkingDay = async (req, res, next) => {
   // Check the day of the week
@@ -435,6 +436,77 @@ const registerLeaveRequest = async (req, res) => {
   }
 };
 
+const getEmployeeAttendance = async (req, res) => {
+  const employeeID = req.params.id;
+  const {companyID} = req.user; // Assuming companyID is available in the request object
+
+  try {
+    const attendance = await Attendance.aggregate([
+      {
+        $match: {companyID, employeeID},
+      },
+      {
+        $project: {
+          '_id': 0,
+          'date': {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$date',
+              timezone: 'Asia/Kolkata',
+            },
+          },
+          'late': '$isLate',
+          'checkIn': 1,
+          'checkout': 1,
+          'status': 1,
+          'Image': 1,
+        },
+      },
+    ]);
+
+    const calendarDataEmp = await Attendance.aggregate([
+      {
+        $match: {employeeID: employeeID},
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$date',
+              timezone: 'Asia/Kolkata',
+            },
+          },
+          title: 'dd',
+          color: {
+            $switch: {
+              branches: [
+                {case: {$eq: ['$status', 'leave']}, then: 'red'},
+                {case: {$eq: ['$status', 'present']}, then: 'green'},
+                {case: {$eq: ['$status', 'late']}, then: 'yellow'},
+              ],
+              default: 'black',
+            },
+          },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      attendance,
+      calendarDataEmp,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'An error occurred while fetching employee attendance data.',
+      error: error.message,
+    });
+  }
+};
+
 
 // Export the controllers and middlewares
 module.exports = {
@@ -448,4 +520,5 @@ module.exports = {
   attendanceType,
   validateLeaveDays,
   registerLeaveRequest,
+  getEmployeeAttendance,
 };

@@ -200,12 +200,22 @@ const getDepartments = async (req, res) => {
       // Stage 1: Match departments based on companyID
       {$match: {companyID}},
 
-      // Stage 2: Left outer join with employees collection
       {
         $lookup: {
           from: 'employees',
-          localField: 'departmentName',
-          foreignField: 'department',
+          let: {departmentName: '$departmentName'},
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {$eq: ['$department', '$$departmentName']},
+                    {$eq: ['$isActive', true]}, // Filter for active employees
+                  ],
+                },
+              },
+            },
+          ],
           as: 'employees',
         },
       },
@@ -216,15 +226,12 @@ const getDepartments = async (req, res) => {
           from: 'attendances',
           let: {departmentName: '$departmentName'},
           pipeline: [
-            // eslint-disable-next-line max-len
-            // Sub-pipeline: Match attendance records for today's date and the current department
             {
               $match: {
                 $expr: {
                   $and: [
                     {$eq: ['$department', '$$departmentName']},
-                    // eslint-disable-next-line max-len
-                    {$gte: ['$date', today]}, // Filter for today's date or later
+                    {$gte: ['$date', today]},
                   ],
                 },
               },
@@ -235,7 +242,6 @@ const getDepartments = async (req, res) => {
       },
 
       // Stage 4: Project department details and counts
-      // Stage 4: Project department details and counts
       {
         $project: {
           departmentName: 1,
@@ -244,7 +250,6 @@ const getDepartments = async (req, res) => {
           attendancesToday: {$size: '$attendance'},
         },
       },
-
     ]);
 
     // Log the aggregated departmentsSummary for debugging purposes
@@ -266,6 +271,7 @@ const getDepartments = async (req, res) => {
     });
   }
 };
+
 
 const getDepEmployees = async (req, res, next) => {
   try {
@@ -322,6 +328,7 @@ const getDepEmployees = async (req, res, next) => {
               employeeID: '$employees.employeeID',
               Email: '$employees.contactEmail',
               role: '$employees.role',
+              active: '$employees.isActive',
               // eslint-disable-next-line max-len
               attendanceStatus: {$ifNull: ['$attendance.status', 'Absent']}, // Include attendance status or default to 'Absent'
             },

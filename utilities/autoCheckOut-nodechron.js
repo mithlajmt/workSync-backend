@@ -44,6 +44,8 @@ const markLeave = async () => {
         const attendance = new Attendance({
           companyID: employee.companyID,
           employeeID: employee.employeeID,
+          role: employee.role,
+          isLate: false,
           date: today,
           status: 'leave',
           department: employee.department,
@@ -65,9 +67,10 @@ cron.schedule('0 23 * * 1-6', async () => {
 
 
 // Schedule the cron job to run at 11:30 AM every day except Sunday
-cron.schedule('30 11 * * 1-6', async () => {
+cron.schedule('0 12 * * 1-6', async () => {
   await markLeave();
 });
+;
 
 
 // cron.schedule('* * * * *', () => {
